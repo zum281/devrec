@@ -1,0 +1,14 @@
+{
+  "authorEmails": ["user@example.com"],
+  "branchStrategy": "all",
+  "groupBy": "repo",
+  "locale": "it-IT",
+  "mainBranch": "main",
+  "repos": [
+    {
+      "name": "my-repo",
+      "path": "/path/to/repo"
+    }
+  ],
+  "sprintLength": 2
+}
