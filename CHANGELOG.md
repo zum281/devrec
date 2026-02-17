@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/zum281/devrec/compare/v1.1.0...v1.2.0) (2026-02-17)
+
+
+### Features
+
+* get email from global git config ([5f85522](https://github.com/zum281/devrec/commit/5f855228f256a8893f3828be1760a73de383b1e3))
+
 # [1.1.0](https://github.com/zum281/devrec/compare/v1.0.0...v1.1.0) (2026-02-17)
 
 
