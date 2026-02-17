@@ -5,6 +5,12 @@ and generates summaries in markdown.
 
 ## Installation
 
+### From npm
+
+```bash
+npm install -g devrec
+```
+
 ### From source
 
 ```bash
