@@ -2,14 +2,16 @@ import { checkbox, confirm, input, search } from "@inquirer/prompts";
 import { basename } from "node:path";
 import { z } from "zod";
 import type { Repo } from "@/types";
+import { scanGlobalGitEmail } from "@/utils/git-email-scanner";
 import { scanGitRepos, toDisplay } from "@/utils/git-repo-scanner";
 import { pathSearchSource } from "@/utils/path-search";
 import { validateRepoPath } from "@/utils/validate-repo";
 
 /**
- * Collects author emails from user with validation
+ * Collects emails manually one at a time with Zod validation.
+ * Used as fallback when no global email is detected or to add extras.
  */
-export const collectAuthorEmails = async (): Promise<Array<string>> => {
+export const collectEmailsManually = async (): Promise<Array<string>> => {
   const emails: Array<string> = [];
   let shouldAddMore = true;
 
@@ -31,6 +33,41 @@ export const collectAuthorEmails = async (): Promise<Array<string>> => {
       message: "Add another email?",
       default: false,
     });
+  }
+
+  return emails;
+};
+
+/**
+ * Collects author emails by detecting the global git config email
+ * and allowing manual additions.
+ */
+export const collectAuthorEmails = async (): Promise<Array<string>> => {
+  const emails: Array<string> = [];
+
+  const globalEmail = await scanGlobalGitEmail();
+
+  if (globalEmail) {
+    const shouldUse = await confirm({
+      message: `Use ${globalEmail} from git config?`,
+      default: true,
+    });
+
+    if (shouldUse) {
+      emails.push(globalEmail);
+    }
+  }
+
+  const shouldAddManually =
+    emails.length === 0 ||
+    (await confirm({
+      message: "Add another email?",
+      default: false,
+    }));
+
+  if (shouldAddManually) {
+    const manualEmails = await collectEmailsManually();
+    emails.push(...manualEmails);
   }
 
   return emails;

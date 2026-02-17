@@ -5,8 +5,9 @@ vi.mock("@inquirer/prompts");
 vi.mock("@/utils/validate-repo");
 vi.mock("@/utils/path-search");
 vi.mock("@/utils/git-repo-scanner");
+vi.mock("@/utils/git-email-scanner");
 
-describe("collectAuthorEmails", () => {
+describe("collectEmailsManually", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -17,8 +18,8 @@ describe("collectAuthorEmails", () => {
     vi.mocked(input).mockResolvedValue("test@example.com");
     vi.mocked(confirm).mockResolvedValue(false);
 
-    const { collectAuthorEmails } = await import("../init-prompts");
-    const result = await collectAuthorEmails();
+    const { collectEmailsManually } = await import("../init-prompts");
+    const result = await collectEmailsManually();
 
     expect(result).toEqual(["test@example.com"]);
     expect(input).toHaveBeenCalledWith(
@@ -42,8 +43,8 @@ describe("collectAuthorEmails", () => {
       return Promise.resolve(confirmCallCount === 1);
     });
 
-    const { collectAuthorEmails } = await import("../init-prompts");
-    const result = await collectAuthorEmails();
+    const { collectEmailsManually } = await import("../init-prompts");
+    const result = await collectEmailsManually();
 
     expect(result).toEqual(["a@example.com", "b@example.com"]);
     expect(input).toHaveBeenCalledTimes(2);
@@ -51,6 +52,85 @@ describe("collectAuthorEmails", () => {
       2,
       expect.objectContaining({ message: "Enter another email address:" }),
     );
+  });
+});
+
+describe("collectAuthorEmails", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("pre-fills global email when user confirms", async () => {
+    const { confirm } = await import("@inquirer/prompts");
+    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+
+    vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
+
+    let confirmCallCount = 0;
+    vi.mocked(confirm).mockImplementation(() => {
+      confirmCallCount++;
+      if (confirmCallCount === 1) return Promise.resolve(true); // use global email
+      return Promise.resolve(false); // don't add more
+    });
+
+    const { collectAuthorEmails } = await import("../init-prompts");
+    const result = await collectAuthorEmails();
+
+    expect(result).toEqual(["global@example.com"]);
+    expect(confirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Use global@example.com from git config?",
+      }),
+    );
+  });
+
+  test("skips global email when user declines", async () => {
+    const { confirm, input } = await import("@inquirer/prompts");
+    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+
+    vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
+    vi.mocked(confirm).mockResolvedValue(false); // decline global, then decline "add another"
+    vi.mocked(input).mockResolvedValue("manual@example.com");
+
+    const { collectAuthorEmails } = await import("../init-prompts");
+    const result = await collectAuthorEmails();
+
+    expect(result).toEqual(["manual@example.com"]);
+  });
+
+  test("falls back to manual when no global email found", async () => {
+    const { confirm, input } = await import("@inquirer/prompts");
+    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+
+    vi.mocked(scanGlobalGitEmail).mockResolvedValue(null);
+    vi.mocked(input).mockResolvedValue("typed@example.com");
+    vi.mocked(confirm).mockResolvedValue(false);
+
+    const { collectAuthorEmails } = await import("../init-prompts");
+    const result = await collectAuthorEmails();
+
+    expect(result).toEqual(["typed@example.com"]);
+  });
+
+  test("combines global email with manual additions", async () => {
+    const { confirm, input } = await import("@inquirer/prompts");
+    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+
+    vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
+    vi.mocked(input).mockResolvedValue("extra@example.com");
+
+    let confirmCallCount = 0;
+    vi.mocked(confirm).mockImplementation(() => {
+      confirmCallCount++;
+      if (confirmCallCount === 1) return Promise.resolve(true); // use global email
+      if (confirmCallCount === 2) return Promise.resolve(true); // add more manually
+      return Promise.resolve(false); // don't add another
+    });
+
+    const { collectAuthorEmails } = await import("../init-prompts");
+    const result = await collectAuthorEmails();
+
+    expect(result).toEqual(["global@example.com", "extra@example.com"]);
   });
 });
 
