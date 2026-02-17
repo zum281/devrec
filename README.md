@@ -30,7 +30,7 @@ npm link
 ### Verify installation
 
 ```bash
-devrec --version
+drec --version
 ```
 
 ## Quick start
@@ -38,7 +38,7 @@ devrec --version
 1. **Initialize configuration**
 
    ```bash
-   devrec init
+   drec init
    ```
 
    This command interactively prompts you for:
@@ -50,41 +50,41 @@ devrec --version
 2. **View today's commits**
 
    ```bash
-   devrec today
+   drec today
    ```
 
 3. **Generate markdown summary**
 
    ```bash
-   devrec today --format markdown --summary
+   drec today --format markdown --summary
    ```
 
 ## Usage
 
 ### Commands
 
-#### `devrec init`
+#### `drec init`
 
 Create or update configuration interactively.
 
-#### `devrec today`
+#### `drec today`
 
 Show commits from today (since midnight).
 
-#### `devrec yesterday`
+#### `drec yesterday`
 
 Show commits from yesterday (previous calendar day).
 
-#### `devrec week`
+#### `drec week`
 
 Show commits from current week (Monday to today). On Monday, shows the previous
 complete week (last Monday to Sunday).
 
-#### `devrec sprint`
+#### `drec sprint`
 
 Show commits from current sprint. Sprint length is configurable (default: 2 weeks).
 
-#### `devrec all`
+#### `drec all`
 
 Show all commits from all time.
 
@@ -179,7 +179,7 @@ Use `remote` to exclude local work-in-progress commits.
 ### Daily standup report
 
 ```bash
-devrec today --format markdown --summary
+drec today --format markdown --summary
 ```
 
 **Output:**
@@ -217,7 +217,7 @@ devrec today --format markdown --summary
 ### Sprint retrospective
 
 ```bash
-devrec sprint --format markdown --summary > sprint-summary.md
+drec sprint --format markdown --summary > sprint-summary.md
 ```
 
 This command generates a markdown file containing all commits from the current
@@ -226,7 +226,7 @@ sprint.
 ### Filter specific repository
 
 ```bash
-devrec week --repo api
+drec week --repo api
 ```
 
 Shows only commits from the repository named "api" in your config.
@@ -234,7 +234,7 @@ Shows only commits from the repository named "api" in your config.
 ### Filter by category
 
 ```bash
-devrec week --repo api --category Feature
+drec week --repo api --category Feature
 ```
 
 Shows only Feature commits from the "api" repository.
@@ -242,7 +242,7 @@ Shows only Feature commits from the "api" repository.
 ### View all commits
 
 ```bash
-devrec all --summary
+drec all --summary
 ```
 
 Shows all commits from all repositories with summary statistics.
@@ -253,7 +253,7 @@ Shows all commits from all repositories with summary statistics.
 
 **Error:** `Config file not found`
 
-**Solution:** Run `devrec init` to create configuration.
+**Solution:** Run `drec init` to create configuration.
 
 ### Invalid repository path
 
@@ -293,7 +293,7 @@ ls -la /path/to/repo
 **Solution:** Force color mode:
 
 ```bash
-devrec today --color always
+drec today --color always
 ```
 
 ### Slow performance with many repos
