@@ -140,6 +140,8 @@ Configuration is stored at `~/.config/devrec/config.json`.
 }
 ```
 
+See [`docs/sample-config.json`](docs/sample-config.json) for a complete example.
+
 ### Fields
 
 | Field            | Type                     | Description                                            | Default   |
