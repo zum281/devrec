@@ -98,14 +98,11 @@ describe("generatePlainOutput", () => {
       color: "always",
     });
 
-    // eslint-disable-next-line no-control-regex
-    expect(result).toMatch(/\u001B\[/);
-    // eslint-disable-next-line no-control-regex
-    expect(result).toMatch(/\u001B\[1m/);
-    // eslint-disable-next-line no-control-regex
-    expect(result).toMatch(/\u001B\[34m/);
-    // eslint-disable-next-line no-control-regex
-    expect(result).toMatch(/\u001B\[(39|22)m/);
+    const ESC = String.fromCodePoint(27);
+    expect(result).toContain(`${ESC}[`);
+    expect(result).toContain(`${ESC}[1m`);
+    expect(result).toContain(`${ESC}[34m`);
+    expect(result.includes(`${ESC}[39m`) || result.includes(`${ESC}[22m`)).toBe(true);
     expect(result).toContain("Features:");
     expect(result).toContain("feat: new feature");
 
@@ -138,8 +135,8 @@ describe("generatePlainOutput", () => {
       color: "auto",
     });
 
-    // eslint-disable-next-line no-control-regex
-    expect(result).toMatch(/\u001B\[/);
+    const ESC = String.fromCodePoint(27);
+    expect(result).toContain(`${ESC}[`);
 
     process.stdout.isTTY = isTTYBackup;
     chalk.level = originalLevel;
@@ -157,8 +154,8 @@ describe("generatePlainOutput", () => {
       color: "auto",
     });
 
-    // eslint-disable-next-line no-control-regex
-    expect(result).not.toMatch(/\u001B\[/);
+    const ESC = String.fromCodePoint(27);
+    expect(result).not.toContain(`${ESC}[`);
 
     process.stdout.isTTY = isTTYBackup;
   });

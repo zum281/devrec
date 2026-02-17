@@ -8,16 +8,13 @@ export const groupBy = <T, K extends PropertyKey>(
   items: Array<T>,
   keyFn: (item: T) => K,
 ): Record<K, Array<T>> => {
-  return items.reduce(
+  return items.reduce<Partial<Record<K, Array<T>>>>(
     (accumulator, item) => {
       const key = keyFn(item);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!accumulator[key]) {
-        accumulator[key] = [];
-      }
+      accumulator[key] ??= [];
       accumulator[key].push(item);
       return accumulator;
     },
-    {} as Record<K, Array<T>>,
-  );
+    {},
+  ) as Record<K, Array<T>>;
 };

@@ -268,7 +268,7 @@ export default tseslint.config(
   // Vitest test files config
   // ========================================
   {
-    files: ["src/**/__test__/*.test.ts"],
+    files: ["src/**/__tests__/*.test.ts"],
     plugins: {
       vitest,
     },
