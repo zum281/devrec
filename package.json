@@ -1,0 +1,87 @@
+{
+  "name": "devrec",
+  "version": "0.0.0",
+  "description": "A CLI tool that analyzes git commits from multiple repos, categorizes them, and generates summaries in markdown.",
+  "keywords": [
+    "cli",
+    "devrec",
+    "git",
+    "review",
+    "standup"
+  ],
+  "homepage": "https://github.com/zum281/devrec#readme",
+  "bugs": {
+    "url": "https://github.com/zum281/devrec/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zum281/devrec.git"
+  },
+  "license": "MIT",
+  "author": "Fulvia Mourikis",
+  "type": "module",
+  "bin": {
+    "drec": "./bin/drec.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli/main.ts",
+    "build": "esbuild src/cli/main.ts --outfile=dist/cli/main.js --bundle --format=esm --platform=node --sourcemap --external:node:* --external:zod --external:simple-git --external:commander --external:@inquirer/prompts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.2",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "esbuild": "^0.20.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "eslint-plugin-tsdoc": "^0.5.0",
+    "eslint-plugin-unicorn": "^57.0.0",
+    "eslint-plugin-unused-imports": "^4.0.0",
+    "eslint-plugin-vitest": "^0.5.4",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.1",
+    "prettier-plugin-sort-json": "^4.0.0",
+    "semantic-release": "^24.2.9",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.2.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "dotenv": "^17.3.1",
+    "envalid": "^8.1.1",
+    "simple-git": "^3.31.1",
+    "zod": "^4.3.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

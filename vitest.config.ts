@@ -1,0 +1,27 @@
+import path from "node:path";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    globals: true,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "json"],
+      include: ["src/**/*.ts"],
+      exclude: ["node_modules/", "dist/", "src/**/__tests__/**"],
+      reportsDirectory: "./coverage",
+      thresholds: {
+        lines: 75,
+        functions: 75,
+        branches: 70,
+        statements: 75,
+      },
+      clean: true,
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "./src"),
+    },
+  },
+});
