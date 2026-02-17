@@ -1,5 +1,11 @@
 # devrec
 
+[![npm version](https://img.shields.io/npm/v/devrec)](https://www.npmjs.com/package/devrec)
+[![npm downloads](https://img.shields.io/npm/dw/devrec)](https://www.npmjs.com/package/devrec)
+[![CI](https://github.com/zum281/devrec/actions/workflows/ci.yml/badge.svg)](https://github.com/zum281/devrec/actions/workflows/ci.yml)
+[![License](https://img.shields.io/npm/l/devrec)](LICENSE)
+[![Bundle size](https://img.shields.io/bundlephobia/min/devrec)](https://bundlephobia.com/package/devrec)
+
 A CLI tool that analyzes git commits from multiple repositories, categorizes them,
 and generates summaries in markdown.
 
