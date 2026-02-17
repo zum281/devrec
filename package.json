@@ -1,6 +1,6 @@
 {
   "name": "devrec",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A CLI tool that analyzes git commits from multiple repos, categorizes them, and generates summaries in markdown.",
   "keywords": [
     "cli",
