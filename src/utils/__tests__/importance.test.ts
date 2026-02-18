@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   detectImportanceByKeyword,
   detectImportanceByMergeStatus,
+  scoreCommit,
 } from "../importance";
+import { createCommitWithBranch } from "./fixtures";
 
 describe("detectImportanceByKeyword", () => {
   describe("high importance", () => {
@@ -182,5 +184,52 @@ describe("detectImportanceByMergeStatus", () => {
 
   it("should return low for unmerged commits", () => {
     expect(detectImportanceByMergeStatus(false)).toBe("low");
+  });
+});
+
+describe("scoreCommit", () => {
+  describe("signal combination matrix", () => {
+    it("should return high when keyword is high and commit is merged", () => {
+      const commit = createCommitWithBranch({
+        message: "security: patch auth bypass",
+        isMerged: true,
+      });
+      expect(scoreCommit(commit)).toBe("high");
+    });
+    it("should return high when keyword is high and commit is unmerged", () => {
+      const commit = createCommitWithBranch({
+        message: "urgent: patch auth bypass",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit)).toBe("high");
+    });
+    it("should return high when keyword is medium and commit is merged (combined boost)", () => {
+      const commit = createCommitWithBranch({
+        message: "deprecation: remove some library",
+        isMerged: true,
+      });
+      expect(scoreCommit(commit)).toBe("high");
+    });
+    it("should return medium when keyword is medium and commit is unmerged", () => {
+      const commit = createCommitWithBranch({
+        message: "deprecation: remove some library",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit)).toBe("medium");
+    });
+    it("should return medium when keyword is low and commit is merged", () => {
+      const commit = createCommitWithBranch({
+        message: "some other message",
+        isMerged: true,
+      });
+      expect(scoreCommit(commit)).toBe("medium");
+    });
+    it("should return low when keyword is low and commit is unmerged", () => {
+      const commit = createCommitWithBranch({
+        message: "some other message",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit)).toBe("low");
+    });
   });
 });

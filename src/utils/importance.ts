@@ -1,4 +1,4 @@
-import type { ImportanceLevel } from "@/types";
+import type { CommitWithBranch, ImportanceLevel } from "@/types";
 
 /**
  * Detects commit importance by scanning the message for high-signal keywords.
@@ -51,3 +51,22 @@ export const importancePatterns: Record<ImportanceLevel, Array<RegExp>> = {
 export const detectImportanceByMergeStatus = (
   isMerged: boolean,
 ): ImportanceLevel => (isMerged ? "medium" : "low");
+
+/**
+ * Scores a commit's importance by combining keyword and merge-status signals.
+ * Keyword high results in high. Keyword medium + merged results in high (combined boost).
+ * Keyword medium alone results in medium. Merged alone results in medium. Otherwise low.
+ *
+ * @param commit - The enriched commit to score.
+ * @returns The final composite {@link ImportanceLevel}.
+ */
+export const scoreCommit = (commit: CommitWithBranch): ImportanceLevel => {
+  const { isMerged, message } = commit;
+  const keywordScore = detectImportanceByKeyword(message);
+
+  if (keywordScore === "high" || (keywordScore === "medium" && isMerged))
+    return "high";
+  if (keywordScore === "medium" || isMerged) return "medium";
+
+  return "low";
+};

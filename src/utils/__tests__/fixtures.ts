@@ -4,6 +4,7 @@ import type {
   ColorMode,
   Commit,
   CommitEntry,
+  CommitWithBranch,
   Config,
   OutputFormat,
   OutputOptions,
@@ -27,6 +28,20 @@ export const createCommit = (overrides?: Partial<Commit>): Commit => ({
   hash: "abc123def456",
   date: MOCK_DATES.today,
   message: "feat: test feature",
+  ...overrides,
+});
+
+/**
+ * Creates a commit with branch information
+ */
+export const createCommitWithBranch = (
+  overrides?: Partial<CommitWithBranch>,
+): CommitWithBranch => ({
+  hash: "abc123def456",
+  date: MOCK_DATES.today,
+  message: "feat: test feature",
+  branches: ["main"],
+  isMerged: false,
   ...overrides,
 });
 
