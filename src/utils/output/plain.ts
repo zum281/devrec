@@ -3,8 +3,10 @@ import type {
   CategorizedCommits,
   ColorMode,
   OutputOptions,
-  SummaryStats,
+  TieredCommits,
+  TieredStats,
 } from "@/types";
+import { mergeCategorizedCommits } from "@/utils/categorize-commits-batch";
 import { calculateStats } from "./calculate-stats";
 import { formatCommitLine } from "./format-commit";
 import {
@@ -86,49 +88,6 @@ export const generatePlainOutput = (
 };
 
 /**
- * Generates plain output with branch information
- * @param merged - Merged commits grouped by category
- * @param unmerged - Unmerged commits grouped by category
- * @param stats - Summary statistics
- * @param options - Output configuration options
- * @returns Formatted plain string
- */
-export const generatePlainOutputWithBranches = (
-  merged: CategorizedCommits,
-  unmerged: CategorizedCommits,
-  stats: SummaryStats,
-  options: OutputOptions,
-): string => {
-  const isColorsEnabled = shouldUseColors(options.color);
-  let output = "";
-
-  if (options.showSummary) {
-    output += isColorsEnabled ? chalk.bold("Summary:\n") : "Summary:\n";
-    output += `  Total Commits: ${stats.totalCommits.toString()}\n`;
-    output += `  Merged to Main: ${stats.mergedCommits.toString()}\n`;
-    output += `  In Progress: ${stats.unmergedCommits.toString()}\n`;
-    output += `  Repositories: ${[...stats.repos].join(", ")}\n\n`;
-  }
-
-  if (stats.mergedCommits > 0) {
-    output += isColorsEnabled
-      ? chalk.bold.green("Merged Work:\n")
-      : "Merged Work:\n";
-    output += generateCategorizedOutput(merged, options, false, isColorsEnabled);
-    output += "\n";
-  }
-
-  if (stats.unmergedCommits > 0) {
-    output += isColorsEnabled
-      ? chalk.bold.yellow("In Progress (Unmerged):\n")
-      : "In Progress (Unmerged):\n";
-    output += generateCategorizedOutput(unmerged, options, true, isColorsEnabled);
-  }
-
-  return output;
-};
-
-/**
  * Helper to generate categorized output section
  * @param categorized - Categorized commits
  * @param options - Output options
@@ -151,4 +110,119 @@ const generateCategorizedOutput = (
   return options.groupBy === "repo"
     ? generateRepoFirstSections(categorized, formatter)
     : generateCategoryFirstSections(categorized, formatter);
+};
+
+/**
+ * Checks if a CategorizedCommits has any commits
+ * @param categorized - Commits grouped by category
+ * @returns True if there are any commits
+ */
+const hasCommits = (categorized: CategorizedCommits): boolean =>
+  Object.values(categorized).some(commits => commits.length > 0);
+
+/**
+ * Combines merged and unmerged categorized commits into one
+ * @param merged - Merged categorized commits
+ * @param unmerged - Unmerged categorized commits
+ * @returns Combined categorized commits
+ */
+const combineMergedUnmerged = (
+  merged: CategorizedCommits,
+  unmerged: CategorizedCommits,
+): CategorizedCommits => {
+  const combined: CategorizedCommits = {};
+  mergeCategorizedCommits(combined, merged);
+  mergeCategorizedCommits(combined, unmerged);
+  return combined;
+};
+
+/**
+ * Generates plain output with importance-tiered sections
+ * @param tiered - Commits partitioned by importance tier
+ * @param stats - Tiered summary statistics
+ * @param options - Output configuration options
+ * @returns Formatted plain string
+ */
+export const generatePlainOutputWithBranches = (
+  tiered: TieredCommits,
+  stats: TieredStats,
+  options: OutputOptions,
+): string => {
+  const isColorsEnabled = shouldUseColors(options.color);
+  let output = "";
+
+  if (options.showSummary) {
+    output += isColorsEnabled ? chalk.bold("Summary:\n") : "Summary:\n";
+    output += `  Total Commits: ${stats.totalCommits.toString()}\n`;
+    output += `  Merged to Main: ${stats.mergedCommits.toString()}\n`;
+    output += `  In Progress: ${stats.unmergedCommits.toString()}\n`;
+
+    if (stats.keyContributionCount > 0) {
+      output += `  Key Contributions: ${stats.keyContributionCount.toString()}\n`;
+    }
+
+    output += `  Repositories: ${[...stats.repos].join(", ")}\n\n`;
+  }
+
+  const hasKeyContributions =
+    hasCommits(tiered.keyContributions.merged) ||
+    hasCommits(tiered.keyContributions.unmerged);
+  const hasOtherWork =
+    hasCommits(tiered.otherWork.merged) || hasCommits(tiered.otherWork.unmerged);
+
+  if (hasKeyContributions && hasOtherWork) {
+    output += isColorsEnabled
+      ? chalk.bold.magenta("Key Contributions:\n")
+      : "Key Contributions:\n";
+    const keyCombined = combineMergedUnmerged(
+      tiered.keyContributions.merged,
+      tiered.keyContributions.unmerged,
+    );
+    output += generateCategorizedOutput(
+      keyCombined,
+      options,
+      true,
+      isColorsEnabled,
+    );
+    output += "\n";
+
+    output += isColorsEnabled ? chalk.bold("Other Work:\n") : "Other Work:\n";
+    const otherCombined = combineMergedUnmerged(
+      tiered.otherWork.merged,
+      tiered.otherWork.unmerged,
+    );
+    output += generateCategorizedOutput(
+      otherCombined,
+      options,
+      true,
+      isColorsEnabled,
+    );
+  } else if (hasKeyContributions) {
+    output += isColorsEnabled
+      ? chalk.bold.magenta("Key Contributions:\n")
+      : "Key Contributions:\n";
+    const keyCombined = combineMergedUnmerged(
+      tiered.keyContributions.merged,
+      tiered.keyContributions.unmerged,
+    );
+    output += generateCategorizedOutput(
+      keyCombined,
+      options,
+      true,
+      isColorsEnabled,
+    );
+  } else if (hasOtherWork) {
+    const otherCombined = combineMergedUnmerged(
+      tiered.otherWork.merged,
+      tiered.otherWork.unmerged,
+    );
+    output += generateCategorizedOutput(
+      otherCombined,
+      options,
+      true,
+      isColorsEnabled,
+    );
+  }
+
+  return output;
 };

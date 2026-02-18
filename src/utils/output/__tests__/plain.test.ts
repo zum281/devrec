@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { describe, expect, test } from "vitest";
-import type { CategorizedCommits, SummaryStats } from "@/types";
+import type { CategorizedCommits, TieredCommits, TieredStats } from "@/types";
 import { generatePlainOutput, generatePlainOutputWithBranches } from "../plain";
 
 describe("generatePlainOutput", () => {
@@ -102,7 +102,9 @@ describe("generatePlainOutput", () => {
     expect(result).toContain(`${ESC}[`);
     expect(result).toContain(`${ESC}[1m`);
     expect(result).toContain(`${ESC}[34m`);
-    expect(result.includes(`${ESC}[39m`) || result.includes(`${ESC}[22m`)).toBe(true);
+    expect(result.includes(`${ESC}[39m`) || result.includes(`${ESC}[22m`)).toBe(
+      true,
+    );
     expect(result).toContain("Features:");
     expect(result).toContain("feat: new feature");
 
@@ -224,36 +226,58 @@ describe("generatePlainOutput", () => {
 });
 
 describe("generatePlainOutputWithBranches", () => {
-  test("generates output with both merged and unmerged sections", () => {
-    const merged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: merged feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
-        },
-      ],
-    };
-    const unmerged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "def456",
-          message: "feat: unmerged feature",
-          date: "2024-03-16T10:00:00Z",
-          repoName: "repo1",
-          branch: "feature/test",
-        },
-      ],
-    };
-    const stats: SummaryStats = {
-      totalCommits: 2,
-      mergedCommits: 1,
-      unmergedCommits: 1,
-      repos: new Set(["repo1"]),
-    };
+  const createTiered = (overrides?: Partial<TieredCommits>): TieredCommits => ({
+    keyContributions: { merged: {}, unmerged: {} },
+    otherWork: { merged: {}, unmerged: {} },
+    ...overrides,
+  });
 
-    const output = generatePlainOutputWithBranches(merged, unmerged, stats, {
+  const createStats = (overrides?: Partial<TieredStats>): TieredStats => ({
+    totalCommits: 0,
+    mergedCommits: 0,
+    unmergedCommits: 0,
+    repos: new Set<string>(),
+    keyContributionCount: 0,
+    ...overrides,
+  });
+
+  test("shows Key Contributions and Other Work when both tiers have commits", () => {
+    const tiered = createTiered({
+      keyContributions: {
+        merged: {
+          Feature: [
+            {
+              hash: "abc123",
+              message: "feat: security patch",
+              date: "2024-03-15T10:00:00Z",
+              repoName: "repo1",
+            },
+          ],
+        },
+        unmerged: {},
+      },
+      otherWork: {
+        merged: {
+          Chore: [
+            {
+              hash: "def456",
+              message: "chore: update deps",
+              date: "2024-03-16T10:00:00Z",
+              repoName: "repo1",
+            },
+          ],
+        },
+        unmerged: {},
+      },
+    });
+    const stats = createStats({
+      totalCommits: 2,
+      mergedCommits: 2,
+      repos: new Set(["repo1"]),
+      keyContributionCount: 1,
+    });
+
+    const output = generatePlainOutputWithBranches(tiered, stats, {
       format: "plain",
       color: "never",
       showSummary: false,
@@ -261,22 +285,58 @@ describe("generatePlainOutputWithBranches", () => {
       locale: "en-US",
     });
 
-    expect(output).toContain("Merged Work:");
-    expect(output).toContain("feat: merged feature");
-    expect(output).toContain("In Progress (Unmerged):");
-    expect(output).toContain("feat: unmerged feature");
-    expect(output).toContain("[feature/test]");
+    expect(output).toContain("Key Contributions:");
+    expect(output).toContain("feat: security patch");
+    expect(output).toContain("Other Work:");
+    expect(output).toContain("chore: update deps");
   });
 
-  test("shows summary when enabled", () => {
-    const stats: SummaryStats = {
+  test("skips tier headers when only other work exists", () => {
+    const tiered = createTiered({
+      otherWork: {
+        merged: {
+          Feature: [
+            {
+              hash: "abc123",
+              message: "feat: feature",
+              date: "2024-03-15T10:00:00Z",
+              repoName: "repo1",
+            },
+          ],
+        },
+        unmerged: {},
+      },
+    });
+    const stats = createStats({
+      totalCommits: 1,
+      mergedCommits: 1,
+      repos: new Set(["repo1"]),
+    });
+
+    const output = generatePlainOutputWithBranches(tiered, stats, {
+      format: "plain",
+      color: "never",
+      showSummary: false,
+      groupBy: "category",
+      locale: "en-US",
+    });
+
+    expect(output).not.toContain("Key Contributions:");
+    expect(output).not.toContain("Other Work:");
+    expect(output).toContain("feat: feature");
+  });
+
+  test("shows summary with key contribution count", () => {
+    const tiered = createTiered();
+    const stats = createStats({
       totalCommits: 5,
       mergedCommits: 3,
       unmergedCommits: 2,
       repos: new Set(["repo1", "repo2"]),
-    };
+      keyContributionCount: 2,
+    });
 
-    const output = generatePlainOutputWithBranches({}, {}, stats, {
+    const output = generatePlainOutputWithBranches(tiered, stats, {
       format: "plain",
       color: "never",
       showSummary: true,
@@ -288,58 +348,59 @@ describe("generatePlainOutputWithBranches", () => {
     expect(output).toContain("Total Commits: 5");
     expect(output).toContain("Merged to Main: 3");
     expect(output).toContain("In Progress: 2");
+    expect(output).toContain("Key Contributions: 2");
     expect(output).toContain("Repositories: repo1, repo2");
   });
 
-  test("omits merged section when no merged commits", () => {
-    const unmerged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
-        },
-      ],
-    };
-    const stats: SummaryStats = {
-      totalCommits: 1,
-      mergedCommits: 0,
-      unmergedCommits: 1,
-      repos: new Set(["repo1"]),
-    };
+  test("omits key contribution count from summary when zero", () => {
+    const tiered = createTiered();
+    const stats = createStats({ totalCommits: 1, repos: new Set(["repo1"]) });
 
-    const output = generatePlainOutputWithBranches({}, unmerged, stats, {
+    const output = generatePlainOutputWithBranches(tiered, stats, {
       format: "plain",
       color: "never",
-      showSummary: false,
+      showSummary: true,
       groupBy: "category",
       locale: "en-US",
     });
 
-    expect(output).not.toContain("Merged Work:");
-    expect(output).toContain("In Progress (Unmerged):");
+    expect(output).not.toContain("Key Contributions:");
   });
 
-  test("omits unmerged section when no unmerged commits", () => {
-    const merged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
+  test("shows branch for unmerged and checkmark for merged", () => {
+    const tiered = createTiered({
+      otherWork: {
+        merged: {
+          Feature: [
+            {
+              hash: "abc123",
+              message: "feat: merged",
+              date: "2024-03-15T10:00:00Z",
+              repoName: "repo1",
+            },
+          ],
         },
-      ],
-    };
-    const stats: SummaryStats = {
-      totalCommits: 1,
+        unmerged: {
+          Feature: [
+            {
+              hash: "def456",
+              message: "feat: unmerged",
+              date: "2024-03-16T10:00:00Z",
+              repoName: "repo1",
+              branch: "feat/test",
+            },
+          ],
+        },
+      },
+    });
+    const stats = createStats({
+      totalCommits: 2,
       mergedCommits: 1,
-      unmergedCommits: 0,
+      unmergedCommits: 1,
       repos: new Set(["repo1"]),
-    };
+    });
 
-    const output = generatePlainOutputWithBranches(merged, {}, stats, {
+    const output = generatePlainOutputWithBranches(tiered, stats, {
       format: "plain",
       color: "never",
       showSummary: false,
@@ -347,35 +408,39 @@ describe("generatePlainOutputWithBranches", () => {
       locale: "en-US",
     });
 
-    expect(output).toContain("Merged Work:");
-    expect(output).not.toContain("In Progress (Unmerged):");
+    expect(output).toContain("\u2713");
+    expect(output).toContain("[feat/test]");
   });
 
   test("groups by repo when specified", () => {
-    const merged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: repo1 feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
+    const tiered = createTiered({
+      otherWork: {
+        merged: {
+          Feature: [
+            {
+              hash: "abc123",
+              message: "feat: repo1 feature",
+              date: "2024-03-15T10:00:00Z",
+              repoName: "repo1",
+            },
+            {
+              hash: "def456",
+              message: "feat: repo2 feature",
+              date: "2024-03-16T10:00:00Z",
+              repoName: "repo2",
+            },
+          ],
         },
-        {
-          hash: "def456",
-          message: "feat: repo2 feature",
-          date: "2024-03-16T10:00:00Z",
-          repoName: "repo2",
-        },
-      ],
-    };
-    const stats: SummaryStats = {
+        unmerged: {},
+      },
+    });
+    const stats = createStats({
       totalCommits: 2,
       mergedCommits: 2,
-      unmergedCommits: 0,
       repos: new Set(["repo1", "repo2"]),
-    };
+    });
 
-    const output = generatePlainOutputWithBranches(merged, {}, stats, {
+    const output = generatePlainOutputWithBranches(tiered, stats, {
       format: "plain",
       color: "never",
       showSummary: false,
@@ -385,64 +450,5 @@ describe("generatePlainOutputWithBranches", () => {
 
     expect(output).toContain("repo1:");
     expect(output).toContain("repo2:");
-  });
-
-  test("does not show branch names for merged commits", () => {
-    const merged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
-          branch: "feature/test",
-        },
-      ],
-    };
-    const stats: SummaryStats = {
-      totalCommits: 1,
-      mergedCommits: 1,
-      unmergedCommits: 0,
-      repos: new Set(["repo1"]),
-    };
-
-    const output = generatePlainOutputWithBranches(merged, {}, stats, {
-      format: "plain",
-      color: "never",
-      showSummary: false,
-      groupBy: "category",
-      locale: "en-US",
-    });
-
-    expect(output).not.toContain("[feature/test]");
-  });
-
-  test("handles color mode", () => {
-    const merged: CategorizedCommits = {
-      Feature: [
-        {
-          hash: "abc123",
-          message: "feat: feature",
-          date: "2024-03-15T10:00:00Z",
-          repoName: "repo1",
-        },
-      ],
-    };
-    const stats: SummaryStats = {
-      totalCommits: 1,
-      mergedCommits: 1,
-      unmergedCommits: 0,
-      repos: new Set(["repo1"]),
-    };
-
-    const output = generatePlainOutputWithBranches(merged, {}, stats, {
-      format: "plain",
-      color: "always",
-      showSummary: false,
-      groupBy: "category",
-      locale: "en-US",
-    });
-
-    expect(output).toContain("feat: feature");
   });
 });

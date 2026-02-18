@@ -98,7 +98,8 @@ All time-range commands support these flags:
 | `--color`    | Color mode           | `always`, `never`, `auto`   | `auto`  |
 | `--summary`  | Show statistics      | (boolean)                   | `false` |
 | `--repo`     | Filter by repository | Repository name from config | All     |
-| `--category` | Filter by category   | Category name               | All     |
+| `--category`  | Filter by category   | Category name               | All     |
+| `--highlight` | Boost matching commits to Key Contributions | Branch name or keyword | None |
 
 ### Categories
 
@@ -116,6 +117,34 @@ Commits are automatically categorized based on prefixes:
 Merge commits are automatically excluded. Jira-formatted commits (such as
 `Resolve TICKET-123 "message"`) are handled by extracting the actual message for
 categorization.
+
+### Importance scoring
+
+Commits are automatically scored by importance and grouped into tiers:
+
+- **Key Contributions** (high + medium importance) -- surfaced at the top of the
+  output
+- **Other Work** (low importance) -- shown below
+
+Importance is determined by two signals:
+
+| Signal              | High                                                                    | Medium                                                | Low             |
+| ------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------- | --------------- |
+| Keywords in message | `security`, `critical`, `breaking`, `hotfix`, `vulnerability`, `urgent` | `performance`, `migration`, `deprecate`, `regression` | Everything else |
+| Merge status        | --                                                                      | Merged to main                                        | Unmerged        |
+
+The two signals combine: a medium keyword on a merged commit becomes high. A commit
+with no keywords that is merged becomes medium.
+
+The `--highlight` flag lets you manually override scoring: any commit whose message
+or branch matches the given value is force-boosted to high importance, bypassing the
+automatic scoring logic. The match is a case-insensitive substring check.
+
+Tier headers only appear when both tiers have commits. When all commits land in a
+single tier, the output renders flat without tier headers.
+
+Within the output, merged commits are prefixed with a checkmark, while unmerged
+commits show their branch name.
 
 ## Configuration
 
@@ -192,26 +221,39 @@ drec today --format markdown --summary
 - **Total Commits**: 8
 - **Merged to Main**: 5
 - **In Progress**: 3
-- **Repositories**: 2
+- **Key Contributions**: 3
+- **Repositories**: api, web-app
 
 ---
 
-## api
+## Key Contributions
 
 ### Feature
 
-- feat: add user authentication endpoint (8:30 AM)
-- feat: implement rate limiting (9:15 AM)
+#### api
+
+    - ✓ [a1b2c3d] feat: add user authentication endpoint _(8:30 AM)_
+    - ✓ [d4e5f6a] feat: implement rate limiting _(9:15 AM)_
 
 ### Bug
 
-- fix: resolve login form validation (10:00 AM)
+#### api
 
-## web-app
+    - [g7h8i9j] fix: critical login vulnerability `[hotfix/login]` _(10:00 AM)_
+
+## Other Work
 
 ### Feature
 
-- feat: add dashboard analytics [feature/analytics] (11:00 AM)
+#### web-app
+
+    - [k0l1m2n] feat: add dashboard analytics `[feature/analytics]` _(11:00 AM)_
+
+### Chore
+
+#### api
+
+    - ✓ [o3p4q5r] chore: update dependencies _(2:00 PM)_
 ```
 
 ### Sprint retrospective
@@ -238,6 +280,15 @@ drec week --repo api --category Feature
 ```
 
 Shows only Feature commits from the "api" repository.
+
+### Highlight specific work
+
+```bash
+drec week --highlight feat/auth
+```
+
+Boosts any commit whose message or branch contains "feat/auth" to Key
+Contributions, regardless of automatic scoring.
 
 ### View all commits
 

@@ -10,7 +10,7 @@ describe("addCommonOptions", () => {
     expect(result).toBe(command);
 
     const options = command.options;
-    expect(options).toHaveLength(5);
+    expect(options).toHaveLength(6);
 
     const optionNames = options.map(opt => opt.long);
     expect(optionNames).toContain("--format");
@@ -18,6 +18,7 @@ describe("addCommonOptions", () => {
     expect(optionNames).toContain("--summary");
     expect(optionNames).toContain("--repo");
     expect(optionNames).toContain("--category");
+    expect(optionNames).toContain("--highlight");
   });
 
   test("format option has correct default", () => {

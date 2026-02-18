@@ -96,9 +96,7 @@ describe("pathSearchSource – path mode", () => {
 
   test("displays ~ prefix for home-relative paths", async () => {
     const home = os.homedir();
-    vi.mocked(readdir).mockResolvedValue([
-      makeDirent("projects", true),
-    ] as never);
+    vi.mocked(readdir).mockResolvedValue([makeDirent("projects", true)] as never);
 
     const results = await pathSearchSource(`${home}/`);
 
@@ -107,9 +105,7 @@ describe("pathSearchSource – path mode", () => {
   });
 
   test("expands ~ in input", async () => {
-    vi.mocked(readdir).mockResolvedValue([
-      makeDirent("docs", true),
-    ] as never);
+    vi.mocked(readdir).mockResolvedValue([makeDirent("docs", true)] as never);
 
     const results = await pathSearchSource("~/");
 
@@ -141,9 +137,7 @@ describe("pathSearchSource – fuzzy mode", () => {
 
   test("returns empty when no repos match", async () => {
     const { scanGitRepos } = await import("@/utils/git-repo-scanner");
-    vi.mocked(scanGitRepos).mockResolvedValue([
-      "/Users/me/projects/foo",
-    ]);
+    vi.mocked(scanGitRepos).mockResolvedValue(["/Users/me/projects/foo"]);
 
     const results = await pathSearchSource("zzz");
 

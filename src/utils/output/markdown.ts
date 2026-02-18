@@ -1,4 +1,10 @@
-import type { CategorizedCommits, OutputOptions, SummaryStats } from "@/types";
+import type {
+  CategorizedCommits,
+  OutputOptions,
+  TieredCommits,
+  TieredStats,
+} from "@/types";
+import { mergeCategorizedCommits } from "@/utils/categorize-commits-batch";
 import { calculateStats } from "./calculate-stats";
 import { formatCommitLine } from "./format-commit";
 import {
@@ -53,19 +59,24 @@ const generateSummary = (
 };
 
 /**
- * Generates summary section with branch information
- * @param stats - Summary statistics
+ * Generates summary section with branch and importance information
+ * @param stats - Tiered summary statistics
  * @param dateRange - Optional date range
  * @returns Summary markdown string
  */
 const generateSummaryWithBranches = (
-  stats: SummaryStats,
+  stats: TieredStats,
   dateRange?: { since: string; until: string },
 ): string => {
   let summary = "## Summary\n\n";
   summary += `- **Total Commits**: ${stats.totalCommits.toString()}\n`;
   summary += `- **Merged to Main**: ${stats.mergedCommits.toString()}\n`;
   summary += `- **In Progress**: ${stats.unmergedCommits.toString()}\n`;
+
+  if (stats.keyContributionCount > 0) {
+    summary += `- **Key Contributions**: ${stats.keyContributionCount.toString()}\n`;
+  }
+
   summary += `- **Repositories**: ${[...stats.repos].join(", ")}\n`;
 
   if (dateRange) {
@@ -108,6 +119,44 @@ const generateRepoFirst = (
 };
 
 /**
+ * Checks if a CategorizedCommits has any commits
+ * @param categorized - Commits grouped by category
+ * @returns True if there are any commits
+ */
+const hasCommits = (categorized: CategorizedCommits): boolean =>
+  Object.values(categorized).some(commits => commits.length > 0);
+
+/**
+ * Combines merged and unmerged categorized commits into one
+ * @param merged - Merged categorized commits
+ * @param unmerged - Unmerged categorized commits
+ * @returns Combined categorized commits
+ */
+const combineMergedUnmerged = (
+  merged: CategorizedCommits,
+  unmerged: CategorizedCommits,
+): CategorizedCommits => {
+  const combined: CategorizedCommits = {};
+  mergeCategorizedCommits(combined, merged);
+  mergeCategorizedCommits(combined, unmerged);
+  return combined;
+};
+
+/**
+ * Renders a section of categorized commits using the appropriate grouping
+ * @param categorized - Combined categorized commits
+ * @param options - Output options
+ * @returns Formatted markdown string
+ */
+const renderSection = (
+  categorized: CategorizedCommits,
+  options: OutputOptions,
+): string =>
+  options.groupBy === "repo"
+    ? generateRepoFirst(categorized, options.locale, true)
+    : generateCategoryFirst(categorized, options.locale, true);
+
+/**
  * Generates markdown output for categorized commits
  * @param categorizedCommits - Commits grouped by category
  * @param options - Output configuration options
@@ -142,18 +191,16 @@ export const generateMarkdownOutput = (
 };
 
 /**
- * Generates markdown output with branch information
- * @param merged - Merged commits grouped by category
- * @param unmerged - Unmerged commits grouped by category
- * @param stats - Summary statistics
+ * Generates markdown output with importance-tiered sections
+ * @param tiered - Commits partitioned by importance tier
+ * @param stats - Tiered summary statistics
  * @param options - Output configuration options
  * @param dateRange - Optional date range for summary
  * @returns Formatted markdown string
  */
 export const generateMarkdownOutputWithBranches = (
-  merged: CategorizedCommits,
-  unmerged: CategorizedCommits,
-  stats: SummaryStats,
+  tiered: TieredCommits,
+  stats: TieredStats,
   options: OutputOptions,
   dateRange?: { since: string; until: string },
 ): string => {
@@ -169,20 +216,39 @@ export const generateMarkdownOutputWithBranches = (
     output += generateSummaryWithBranches(stats, dateRange);
   }
 
-  if (stats.mergedCommits > 0) {
-    output += "## Merged Work\n\n";
-    output +=
-      options.groupBy === "repo"
-        ? generateRepoFirst(merged, options.locale, false)
-        : generateCategoryFirst(merged, options.locale, false);
-  }
+  const hasKeyContributions =
+    hasCommits(tiered.keyContributions.merged) ||
+    hasCommits(tiered.keyContributions.unmerged);
+  const hasOtherWork =
+    hasCommits(tiered.otherWork.merged) || hasCommits(tiered.otherWork.unmerged);
 
-  if (stats.unmergedCommits > 0) {
-    output += "## In Progress (Unmerged)\n\n";
-    output +=
-      options.groupBy === "repo"
-        ? generateRepoFirst(unmerged, options.locale, true)
-        : generateCategoryFirst(unmerged, options.locale, true);
+  if (hasKeyContributions && hasOtherWork) {
+    output += "## Key Contributions\n\n";
+    const keyCombined = combineMergedUnmerged(
+      tiered.keyContributions.merged,
+      tiered.keyContributions.unmerged,
+    );
+    output += renderSection(keyCombined, options);
+
+    output += "## Other Work\n\n";
+    const otherCombined = combineMergedUnmerged(
+      tiered.otherWork.merged,
+      tiered.otherWork.unmerged,
+    );
+    output += renderSection(otherCombined, options);
+  } else if (hasKeyContributions) {
+    output += "## Key Contributions\n\n";
+    const keyCombined = combineMergedUnmerged(
+      tiered.keyContributions.merged,
+      tiered.keyContributions.unmerged,
+    );
+    output += renderSection(keyCombined, options);
+  } else if (hasOtherWork) {
+    const otherCombined = combineMergedUnmerged(
+      tiered.otherWork.merged,
+      tiered.otherWork.unmerged,
+    );
+    output += renderSection(otherCombined, options);
   }
 
   output += "_Generated by devrec_\n";

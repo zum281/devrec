@@ -85,4 +85,38 @@ export type OutputOptions = {
   showSummary: boolean;
   groupBy: "repo" | "category";
   locale: string;
+  highlight?: string;
+};
+
+/**
+ * Commit importance levels
+ */
+export type ImportanceLevel = "high" | "medium" | "low";
+
+/*
+ * Commit with importance level
+ */
+export type ScoredCommit = Commit & { importance: ImportanceLevel };
+
+/**
+ * Merged and unmerged commits grouped by category
+ */
+export type MergedUnmergedCommits = {
+  merged: CategorizedCommits;
+  unmerged: CategorizedCommits;
+};
+
+/**
+ * Commits partitioned by importance tier
+ */
+export type TieredCommits = {
+  keyContributions: MergedUnmergedCommits;
+  otherWork: MergedUnmergedCommits;
+};
+
+/**
+ * Summary statistics with key contribution count
+ */
+export type TieredStats = SummaryStats & {
+  keyContributionCount: number;
 };

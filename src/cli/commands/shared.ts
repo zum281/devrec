@@ -11,7 +11,8 @@ export const addCommonOptions = (command: Command): Command => {
     .option("--color <mode>", "Color mode: always, never, or auto", "auto")
     .option("--summary", "Show summary statistics", false)
     .option("--repo <name>", "Filter by repository name")
-    .option("--category <name>", "Filter by category name");
+    .option("--category <name>", "Filter by category name")
+    .option("--highlight <value>", "Highlight commits matching branch or keyword");
 };
 
 /**
@@ -23,4 +24,5 @@ export type CommandOptions = {
   summary: boolean;
   repo?: string;
   category?: string;
+  highlight?: string;
 };

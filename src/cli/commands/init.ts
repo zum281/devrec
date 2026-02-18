@@ -27,7 +27,9 @@ export const registerInitCommand = (program: Command): void => {
             console.log("Init cancelled.");
             process.exit(0);
           }
-        } catch { /* config doesn't exist, continue */ }
+        } catch {
+          /* config doesn't exist, continue */
+        }
 
         const authorEmails = await collectAuthorEmails();
         const repos = await collectRepos();

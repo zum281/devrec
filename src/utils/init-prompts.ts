@@ -82,8 +82,7 @@ export const collectReposManually = async (): Promise<Array<Repo>> => {
 
   while (shouldAddMore) {
     const name = await input({
-      message:
-        repos.length === 0 ? "Enter repo name:" : "Enter another repo name:",
+      message: repos.length === 0 ? "Enter repo name:" : "Enter another repo name:",
       validate: (value: string) =>
         value.trim().length > 0 ? true : "Name required",
     });

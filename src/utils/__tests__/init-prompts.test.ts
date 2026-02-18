@@ -210,12 +210,8 @@ describe("collectRepos", () => {
     const { collectRepos } = await import("../init-prompts");
     const result = await collectRepos();
 
-    expect(result).toEqual([
-      { name: "repo-a", path: "/Users/me/projects/repo-a" },
-    ]);
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      "Scanning for git repositories...",
-    );
+    expect(result).toEqual([{ name: "repo-a", path: "/Users/me/projects/repo-a" }]);
+    expect(consoleLogSpy).toHaveBeenCalledWith("Scanning for git repositories...");
   });
 
   test("falls back to manual entry when no repos found", async () => {
@@ -233,15 +229,11 @@ describe("collectRepos", () => {
     const result = await collectRepos();
 
     expect(result).toEqual([{ name: "manual-repo", path: "/manual/path" }]);
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      "No git repositories found.",
-    );
+    expect(consoleLogSpy).toHaveBeenCalledWith("No git repositories found.");
   });
 
   test("allows adding manual repos after scan selection", async () => {
-    const { checkbox, confirm, input, search } = await import(
-      "@inquirer/prompts"
-    );
+    const { checkbox, confirm, input, search } = await import("@inquirer/prompts");
     const { scanGitRepos } = await import("@/utils/git-repo-scanner");
     const { validateRepoPath } = await import("@/utils/validate-repo");
 
