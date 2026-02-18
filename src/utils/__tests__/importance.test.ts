@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { detectImportanceByKeyword } from "../importance";
+import {
+  detectImportanceByKeyword,
+  detectImportanceByMergeStatus,
+} from "../importance";
 
 describe("detectImportanceByKeyword", () => {
   describe("high importance", () => {
@@ -169,5 +172,15 @@ describe("detectImportanceByKeyword", () => {
         detectImportanceByKeyword("Resolve PROJ-456 performance improvement"),
       ).toBe("medium");
     });
+  });
+});
+
+describe("detectImportanceByMergeStatus", () => {
+  it("should return medium for merged commits", () => {
+    expect(detectImportanceByMergeStatus(true)).toBe("medium");
+  });
+
+  it("should return low for unmerged commits", () => {
+    expect(detectImportanceByMergeStatus(false)).toBe("low");
   });
 });

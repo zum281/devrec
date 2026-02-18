@@ -39,3 +39,15 @@ export const importancePatterns: Record<ImportanceLevel, Array<RegExp>> = {
   medium: [/performance/i, /migration/i, /deprecat(e|ed|ion)/i, /regression/i],
   low: [],
 } as const;
+
+/**
+ * Detects commit importance based on merge status into the main branch.
+ * Merged commits receive a "medium" boost; unmerged commits return "low".
+ * Intended as a standalone signal -- combined with keyword detection in the composite scorer.
+ *
+ * @param isMerged - Whether the commit has been merged into the main branch.
+ * @returns The corresponding {@link ImportanceLevel}.
+ */
+export const detectImportanceByMergeStatus = (
+  isMerged: boolean,
+): ImportanceLevel => (isMerged ? "medium" : "low");
