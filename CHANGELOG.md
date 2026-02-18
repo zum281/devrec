@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/zum281/devrec/compare/v1.2.0...v1.3.0) (2026-02-18)
+
+
+### Features
+
+* importance scoring engine ([02bbf3e](https://github.com/zum281/devrec/commit/02bbf3eb15720070c7ff18bc2688b809e3a68757))
+
 # [1.2.0](https://github.com/zum281/devrec/compare/v1.1.0...v1.2.0) (2026-02-17)
 
 
