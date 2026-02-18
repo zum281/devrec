@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: main
-          persist-credentials: false
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,5 +46,5 @@ jobs:
         run: npx semantic-release
         env:
           HUSKY: "0"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
