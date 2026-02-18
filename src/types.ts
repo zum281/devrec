@@ -86,3 +86,8 @@ export type OutputOptions = {
   groupBy: "repo" | "category";
   locale: string;
 };
+
+/**
+ * Commit importance levels
+ */
+export type ImportanceLevel = "high" | "medium" | "low";
