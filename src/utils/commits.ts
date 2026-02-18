@@ -117,11 +117,13 @@ const accumulatePartition = (
  * Fetches commits with branch information, scores by importance, and separates into tiers
  * @param config - Configuration object with repos and author emails
  * @param dateRange - Optional date range
+ * @param highlight - Optional highlight string to force-boost matching commits
  * @returns Tiered commits and statistics
  */
 export const fetchAndCategorizeCommitsWithBranches = async (
   config: Config,
   dateRange?: { since: string; until: string },
+  highlight?: string,
 ): Promise<{
   tiered: TieredCommits;
   stats: TieredStats;
@@ -153,7 +155,7 @@ export const fetchAndCategorizeCommitsWithBranches = async (
 
       repos.add(repo.name);
 
-      const { key, other } = partitionByImportance(log);
+      const { key, other } = partitionByImportance(log, highlight);
       keyContributionCount += key.length;
 
       const keyCounts = accumulatePartition(

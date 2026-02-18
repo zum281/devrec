@@ -236,9 +236,80 @@ describe("partitionByImportance", () => {
     expect(key).toHaveLength(0);
     expect(other).toHaveLength(0);
   });
+
+  it("should boost matching commits to key when highlight is provided", () => {
+    const commits = [
+      createCommitWithBranch({
+        message: "feat: add button",
+        isMerged: false,
+        primaryBranch: "feat/auth",
+      }),
+      createCommitWithBranch({
+        message: "chore: update deps",
+        isMerged: false,
+      }),
+    ];
+    const { key, other } = partitionByImportance(commits, "feat/auth");
+    expect(key).toHaveLength(1);
+    expect(other).toHaveLength(1);
+  });
 });
 
 describe("scoreCommit", () => {
+  describe("highlight override", () => {
+    it("should return high when highlight matches commit message", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: implement auth flow",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit, "auth")).toBe("high");
+    });
+
+    it("should return high when highlight matches primaryBranch", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: add button",
+        isMerged: false,
+        primaryBranch: "feat/auth",
+      });
+      expect(scoreCommit(commit, "feat/auth")).toBe("high");
+    });
+
+    it("should return high when highlight matches a branches entry", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: add button",
+        isMerged: false,
+        branches: ["main", "feat/auth-flow"],
+      });
+      expect(scoreCommit(commit, "auth-flow")).toBe("high");
+    });
+
+    it("should match case-insensitively", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: AUTH flow",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit, "auth")).toBe("high");
+      expect(scoreCommit(commit, "AUTH")).toBe("high");
+      expect(scoreCommit(commit, "Auth")).toBe("high");
+    });
+
+    it("should fall through to normal scoring when highlight does not match", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: add button",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit, "auth")).toBe("low");
+    });
+
+    it("should use normal scoring when highlight is undefined", () => {
+      const commit = createCommitWithBranch({
+        message: "feat: add button",
+        isMerged: false,
+      });
+      expect(scoreCommit(commit)).toBe("low");
+    });
+  });
+
   describe("signal combination matrix", () => {
     it("should return high when keyword is high and commit is merged", () => {
       const commit = createCommitWithBranch({

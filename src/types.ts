@@ -85,6 +85,7 @@ export type OutputOptions = {
   showSummary: boolean;
   groupBy: "repo" | "category";
   locale: string;
+  highlight?: string;
 };
 
 /**

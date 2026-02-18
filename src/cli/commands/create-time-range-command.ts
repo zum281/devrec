@@ -47,11 +47,13 @@ export const createTimeRangeCommand = (
             showSummary: options.summary,
             groupBy: config.groupBy,
             locale: config.locale,
+            highlight: options.highlight,
           };
 
           const { tiered, stats } = await fetchAndCategorizeCommitsWithBranches(
             config,
             dateRange,
+            options.highlight,
           );
 
           const filteredTiered = filterTieredCommits(tiered, {

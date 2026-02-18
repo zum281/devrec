@@ -98,7 +98,8 @@ All time-range commands support these flags:
 | `--color`    | Color mode           | `always`, `never`, `auto`   | `auto`  |
 | `--summary`  | Show statistics      | (boolean)                   | `false` |
 | `--repo`     | Filter by repository | Repository name from config | All     |
-| `--category` | Filter by category   | Category name               | All     |
+| `--category`  | Filter by category   | Category name               | All     |
+| `--highlight` | Boost matching commits to Key Contributions | Branch name or keyword | None |
 
 ### Categories
 
@@ -134,6 +135,10 @@ Importance is determined by two signals:
 
 The two signals combine: a medium keyword on a merged commit becomes high. A commit
 with no keywords that is merged becomes medium.
+
+The `--highlight` flag lets you manually override scoring: any commit whose message
+or branch matches the given value is force-boosted to high importance, bypassing the
+automatic scoring logic. The match is a case-insensitive substring check.
 
 Tier headers only appear when both tiers have commits. When all commits land in a
 single tier, the output renders flat without tier headers.
@@ -275,6 +280,15 @@ drec week --repo api --category Feature
 ```
 
 Shows only Feature commits from the "api" repository.
+
+### Highlight specific work
+
+```bash
+drec week --highlight feat/auth
+```
+
+Boosts any commit whose message or branch contains "feat/auth" to Key
+Contributions, regardless of automatic scoring.
 
 ### View all commits
 

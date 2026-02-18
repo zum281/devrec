@@ -53,14 +53,41 @@ export const detectImportanceByMergeStatus = (
 ): ImportanceLevel => (isMerged ? "medium" : "low");
 
 /**
+ * Checks if a commit matches the highlight value via case-insensitive substring match
+ * against the commit message, primaryBranch, or any branch entry.
+ *
+ * @param commit - The enriched commit to check.
+ * @param highlight - The highlight string to match against.
+ * @returns Whether the commit matches the highlight value.
+ */
+const isHighlightMatch = (
+  commit: CommitWithBranch,
+  highlight: string,
+): boolean => {
+  const lower = highlight.toLowerCase();
+
+  if (commit.message.toLowerCase().includes(lower)) return true;
+  if (commit.primaryBranch?.toLowerCase().includes(lower)) return true;
+
+  return commit.branches.some(branch => branch.toLowerCase().includes(lower));
+};
+
+/**
  * Scores a commit's importance by combining keyword and merge-status signals.
- * Keyword high results in high. Keyword medium + merged results in high (combined boost).
+ * If a highlight value is provided and the commit matches, returns "high" immediately.
+ * Otherwise: keyword high results in high. Keyword medium + merged results in high (combined boost).
  * Keyword medium alone results in medium. Merged alone results in medium. Otherwise low.
  *
  * @param commit - The enriched commit to score.
+ * @param highlight - Optional highlight string to force-boost matching commits.
  * @returns The final composite {@link ImportanceLevel}.
  */
-export const scoreCommit = (commit: CommitWithBranch): ImportanceLevel => {
+export const scoreCommit = (
+  commit: CommitWithBranch,
+  highlight?: string,
+): ImportanceLevel => {
+  if (highlight && isHighlightMatch(commit, highlight)) return "high";
+
   const { isMerged, message } = commit;
   const keywordScore = detectImportanceByKeyword(message);
 
@@ -75,16 +102,18 @@ export const scoreCommit = (commit: CommitWithBranch): ImportanceLevel => {
  * Partitions commits into key (high/medium importance) and other (low importance) groups.
  *
  * @param commits - Enriched commits with branch and merge info.
+ * @param highlight - Optional highlight string to force-boost matching commits.
  * @returns Object with `key` (high + medium) and `other` (low) commit arrays.
  */
 export const partitionByImportance = (
   commits: Array<CommitWithBranch>,
+  highlight?: string,
 ): { key: Array<CommitWithBranch>; other: Array<CommitWithBranch> } => {
   const key: Array<CommitWithBranch> = [];
   const other: Array<CommitWithBranch> = [];
 
   for (const commit of commits) {
-    const level = scoreCommit(commit);
+    const level = scoreCommit(commit, highlight);
     if (level === "low") {
       other.push(commit);
     } else {
