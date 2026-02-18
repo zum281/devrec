@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import type { CategorizedCommits, Config } from "@/types";
+import type { CategorizedCommits, Config, TieredCommits } from "@/types";
 import {
   calculateStatsFromFiltered,
+  calculateTieredStats,
   fetchAndCategorizeCommits,
   filterCommits,
+  filterTieredCommits,
   groupByRepo,
   groupCommitsByRepo,
   outputCommits,
@@ -917,5 +919,101 @@ describe("calculateStatsFromFiltered", () => {
     expect(stats.totalCommits).toBe(6);
     expect(stats.mergedCommits).toBe(3);
     expect(stats.unmergedCommits).toBe(3);
+  });
+});
+
+describe("filterTieredCommits", () => {
+  const sampleTiered: TieredCommits = {
+    keyContributions: {
+      merged: {
+        Feature: [
+          createCommitEntry({
+            hash: "k1",
+            message: "feat: security fix",
+            repoName: "repo1",
+          }),
+        ],
+      },
+      unmerged: {
+        Feature: [
+          createCommitEntry({
+            hash: "k2",
+            message: "feat: breaking change",
+            repoName: "repo2",
+          }),
+        ],
+      },
+    },
+    otherWork: {
+      merged: {
+        Chore: [
+          createCommitEntry({
+            hash: "o1",
+            message: "chore: deps",
+            repoName: "repo1",
+          }),
+          createCommitEntry({
+            hash: "o2",
+            message: "chore: lint",
+            repoName: "repo2",
+          }),
+        ],
+      },
+      unmerged: {},
+    },
+  };
+
+  test("returns all commits when no filters", () => {
+    const result = filterTieredCommits(sampleTiered);
+    expect(result).toEqual(sampleTiered);
+  });
+
+  test("filters by repo across all tiers", () => {
+    const result = filterTieredCommits(sampleTiered, { repo: "repo1" });
+    expect(result.keyContributions.merged.Feature).toHaveLength(1);
+    expect(result.keyContributions.unmerged).toEqual({});
+    expect(result.otherWork.merged.Chore).toHaveLength(1);
+    expect(result.otherWork.merged.Chore[0].hash).toBe("o1");
+  });
+
+  test("filters by category across all tiers", () => {
+    const result = filterTieredCommits(sampleTiered, { category: "Chore" });
+    expect(result.keyContributions.merged).toEqual({});
+    expect(result.keyContributions.unmerged).toEqual({});
+    expect(result.otherWork.merged.Chore).toHaveLength(2);
+  });
+});
+
+describe("calculateTieredStats", () => {
+  test("calculates stats from tiered commits", () => {
+    const tiered: TieredCommits = {
+      keyContributions: {
+        merged: { Feature: [createCommitEntry()] },
+        unmerged: { Feature: [createCommitEntry(), createCommitEntry()] },
+      },
+      otherWork: {
+        merged: { Chore: [createCommitEntry()] },
+        unmerged: {},
+      },
+    };
+    const stats = calculateTieredStats(tiered, new Set(["repo1"]));
+    expect(stats.totalCommits).toBe(4);
+    expect(stats.mergedCommits).toBe(2);
+    expect(stats.unmergedCommits).toBe(2);
+    expect(stats.keyContributionCount).toBe(3);
+    expect(stats.repos).toEqual(new Set(["repo1"]));
+  });
+
+  test("returns zero key contributions when all low importance", () => {
+    const tiered: TieredCommits = {
+      keyContributions: { merged: {}, unmerged: {} },
+      otherWork: {
+        merged: { Chore: [createCommitEntry()] },
+        unmerged: { Feature: [createCommitEntry()] },
+      },
+    };
+    const stats = calculateTieredStats(tiered, new Set(["repo1"]));
+    expect(stats.keyContributionCount).toBe(0);
+    expect(stats.totalCommits).toBe(2);
   });
 });

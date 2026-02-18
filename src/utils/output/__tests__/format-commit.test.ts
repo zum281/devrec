@@ -62,7 +62,7 @@ describe("format-commit", () => {
         isColorsEnabled: false,
       });
 
-      expect(result).toContain("- [abcdef1] test: commit message");
+      expect(result).toContain("\u2713 [abcdef1] test: commit message");
       expect(result).not.toContain("`[");
       expect(result).toMatch(/_\(.*Jan.*2024.*\)_/);
     });
@@ -242,7 +242,7 @@ describe("format-commit", () => {
   });
 
   describe("empty branch handling", () => {
-    it("should handle empty string branch", () => {
+    it("should handle empty string branch as merged (shows checkmark)", () => {
       const commit = createCommit({ branch: "" });
       const result = formatCommitLine(commit, {
         format: "markdown",
@@ -252,7 +252,7 @@ describe("format-commit", () => {
       });
 
       expect(result).not.toContain("``");
-      expect(result).toContain("- [abcdef1] test: commit message");
+      expect(result).toContain("\u2713 [abcdef1] test: commit message");
       expect(result).toMatch(/_\(.*Jan.*2024.*\)_/);
     });
 
@@ -266,9 +266,58 @@ describe("format-commit", () => {
         isColorsEnabled: false,
       });
 
-      expect(result).toContain("- [abcdef1] test: commit message");
+      expect(result).toContain("\u2713 [abcdef1] test: commit message");
       expect(result).toMatch(/\(.*Jan.*2024.*\)/);
-      expect(result).not.toContain("] ["); // No double brackets for branch
+    });
+  });
+
+  describe("merged commit checkmark", () => {
+    it("should show checkmark for merged commit in markdown when showBranches is true", () => {
+      const commit = createCommit();
+      const result = formatCommitLine(commit, {
+        format: "markdown",
+        locale: "en-US",
+        showBranches: true,
+        isColorsEnabled: false,
+      });
+
+      expect(result).toMatch(/^\s+- \u2713 \[abcdef1]/);
+    });
+
+    it("should not show checkmark when showBranches is false", () => {
+      const commit = createCommit();
+      const result = formatCommitLine(commit, {
+        format: "markdown",
+        locale: "en-US",
+        showBranches: false,
+        isColorsEnabled: false,
+      });
+
+      expect(result).not.toContain("\u2713");
+    });
+
+    it("should not show checkmark for unmerged commit with branch", () => {
+      const commit = createCommit({ branch: "feat/my-branch" });
+      const result = formatCommitLine(commit, {
+        format: "plain",
+        locale: "en-US",
+        showBranches: true,
+        isColorsEnabled: false,
+      });
+
+      expect(result).not.toContain("\u2713");
+    });
+
+    it("should show checkmark in plain text without colors", () => {
+      const commit = createCommit();
+      const result = formatCommitLine(commit, {
+        format: "plain",
+        locale: "en-US",
+        showBranches: true,
+        isColorsEnabled: false,
+      });
+
+      expect(result).toMatch(/^\s+- \u2713 \[abcdef1]/);
     });
   });
 });

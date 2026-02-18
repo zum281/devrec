@@ -58,9 +58,7 @@ describe("scanGitRepos", () => {
   });
 
   test("returns sorted repo paths from find output", async () => {
-    mockExecSuccess(
-      `${HOME}/b-repo/.git\n${HOME}/a-repo/.git\n`,
-    );
+    mockExecSuccess(`${HOME}/b-repo/.git\n${HOME}/a-repo/.git\n`);
 
     const repos = await scanGitRepos();
 

@@ -1,11 +1,35 @@
 import { Command } from "commander";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { TieredCommits, TieredStats } from "@/types";
 
 vi.mock("@/utils/read-config");
 vi.mock("@/utils/commits");
 vi.mock("@/utils/output/plain");
 vi.mock("@/utils/output/markdown");
 vi.mock("@/utils/process-exit");
+
+const emptyTiered: TieredCommits = {
+  keyContributions: { merged: {}, unmerged: {} },
+  otherWork: { merged: {}, unmerged: {} },
+};
+
+const emptyStats: TieredStats = {
+  totalCommits: 0,
+  mergedCommits: 0,
+  unmergedCommits: 0,
+  repos: new Set(),
+  keyContributionCount: 0,
+};
+
+const mockConfig = {
+  authorEmails: ["test@example.com"],
+  repos: [{ name: "repo1", path: "/path" }],
+  sprintLength: 2,
+  groupBy: "repo" as const,
+  locale: "en-US",
+  mainBranch: "main",
+  branchStrategy: "all" as const,
+};
 
 describe("createTimeRangeCommand", () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -35,41 +59,19 @@ describe("createTimeRangeCommand", () => {
     const { readConfig } = await import("@/utils/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
-      filterCommits,
-      calculateStatsFromFiltered,
+      filterTieredCommits,
+      calculateTieredStats,
     } = await import("@/utils/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
-    vi.mocked(readConfig).mockResolvedValue({
-      authorEmails: ["test@example.com"],
-      repos: [{ name: "repo1", path: "/path" }],
-      sprintLength: 2,
-      groupBy: "repo",
-      locale: "en-US",
-      mainBranch: "main",
-      branchStrategy: "all",
-    });
-
+    vi.mocked(readConfig).mockResolvedValue(mockConfig);
     vi.mocked(fetchAndCategorizeCommitsWithBranches).mockResolvedValue({
-      merged: { feature: [] },
-      unmerged: {},
-      stats: {
-        totalCommits: 0,
-        mergedCommits: 0,
-        unmergedCommits: 0,
-        repos: new Set(),
-      },
+      tiered: emptyTiered,
+      stats: emptyStats,
     });
-
-    vi.mocked(filterCommits).mockReturnValue({});
-    vi.mocked(calculateStatsFromFiltered).mockReturnValue({
-      totalCommits: 0,
-      mergedCommits: 0,
-      unmergedCommits: 0,
-      repos: new Set(),
-    });
-
+    vi.mocked(filterTieredCommits).mockReturnValue(emptyTiered);
+    vi.mocked(calculateTieredStats).mockReturnValue(emptyStats);
     vi.mocked(generatePlainOutputWithBranches).mockReturnValue("plain output");
 
     const { createTimeRangeCommand } = await import("../create-time-range-command");
@@ -92,41 +94,19 @@ describe("createTimeRangeCommand", () => {
     const { readConfig } = await import("@/utils/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
-      filterCommits,
-      calculateStatsFromFiltered,
+      filterTieredCommits,
+      calculateTieredStats,
     } = await import("@/utils/commits");
     const { generateMarkdownOutputWithBranches } =
       await import("@/utils/output/markdown");
 
-    vi.mocked(readConfig).mockResolvedValue({
-      authorEmails: ["test@example.com"],
-      repos: [{ name: "repo1", path: "/path" }],
-      sprintLength: 2,
-      groupBy: "repo",
-      locale: "en-US",
-      mainBranch: "main",
-      branchStrategy: "all",
-    });
-
+    vi.mocked(readConfig).mockResolvedValue(mockConfig);
     vi.mocked(fetchAndCategorizeCommitsWithBranches).mockResolvedValue({
-      merged: { feature: [] },
-      unmerged: {},
-      stats: {
-        totalCommits: 0,
-        mergedCommits: 0,
-        unmergedCommits: 0,
-        repos: new Set(),
-      },
+      tiered: emptyTiered,
+      stats: emptyStats,
     });
-
-    vi.mocked(filterCommits).mockReturnValue({});
-    vi.mocked(calculateStatsFromFiltered).mockReturnValue({
-      totalCommits: 0,
-      mergedCommits: 0,
-      unmergedCommits: 0,
-      repos: new Set(),
-    });
-
+    vi.mocked(filterTieredCommits).mockReturnValue(emptyTiered);
+    vi.mocked(calculateTieredStats).mockReturnValue(emptyStats);
     vi.mocked(generateMarkdownOutputWithBranches).mockReturnValue("# Markdown");
 
     const { createTimeRangeCommand } = await import("../create-time-range-command");
@@ -149,41 +129,19 @@ describe("createTimeRangeCommand", () => {
     const { readConfig } = await import("@/utils/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
-      filterCommits,
-      calculateStatsFromFiltered,
+      filterTieredCommits,
+      calculateTieredStats,
     } = await import("@/utils/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
-    vi.mocked(readConfig).mockResolvedValue({
-      authorEmails: ["test@example.com"],
-      repos: [{ name: "repo1", path: "/path" }],
-      sprintLength: 2,
-      groupBy: "repo",
-      locale: "en-US",
-      mainBranch: "main",
-      branchStrategy: "all",
-    });
-
+    vi.mocked(readConfig).mockResolvedValue(mockConfig);
     vi.mocked(fetchAndCategorizeCommitsWithBranches).mockResolvedValue({
-      merged: { feature: [] },
-      unmerged: {},
-      stats: {
-        totalCommits: 0,
-        mergedCommits: 0,
-        unmergedCommits: 0,
-        repos: new Set(),
-      },
+      tiered: emptyTiered,
+      stats: emptyStats,
     });
-
-    vi.mocked(filterCommits).mockReturnValue({});
-    vi.mocked(calculateStatsFromFiltered).mockReturnValue({
-      totalCommits: 0,
-      mergedCommits: 0,
-      unmergedCommits: 0,
-      repos: new Set(),
-    });
-
+    vi.mocked(filterTieredCommits).mockReturnValue(emptyTiered);
+    vi.mocked(calculateTieredStats).mockReturnValue(emptyStats);
     vi.mocked(generatePlainOutputWithBranches).mockReturnValue("output");
 
     const { createTimeRangeCommand } = await import("../create-time-range-command");
@@ -198,7 +156,7 @@ describe("createTimeRangeCommand", () => {
 
     await program.parseAsync(["node", "test", "test", "--repo", "my-repo"]);
 
-    expect(filterCommits).toHaveBeenCalledWith(
+    expect(filterTieredCommits).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ repo: "my-repo" }),
     );
@@ -208,41 +166,19 @@ describe("createTimeRangeCommand", () => {
     const { readConfig } = await import("@/utils/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
-      filterCommits,
-      calculateStatsFromFiltered,
+      filterTieredCommits,
+      calculateTieredStats,
     } = await import("@/utils/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
-    vi.mocked(readConfig).mockResolvedValue({
-      authorEmails: ["test@example.com"],
-      repos: [{ name: "repo1", path: "/path" }],
-      sprintLength: 2,
-      groupBy: "repo",
-      locale: "en-US",
-      mainBranch: "main",
-      branchStrategy: "all",
-    });
-
+    vi.mocked(readConfig).mockResolvedValue(mockConfig);
     vi.mocked(fetchAndCategorizeCommitsWithBranches).mockResolvedValue({
-      merged: { feature: [] },
-      unmerged: {},
-      stats: {
-        totalCommits: 0,
-        mergedCommits: 0,
-        unmergedCommits: 0,
-        repos: new Set(),
-      },
+      tiered: emptyTiered,
+      stats: emptyStats,
     });
-
-    vi.mocked(filterCommits).mockReturnValue({});
-    vi.mocked(calculateStatsFromFiltered).mockReturnValue({
-      totalCommits: 0,
-      mergedCommits: 0,
-      unmergedCommits: 0,
-      repos: new Set(),
-    });
-
+    vi.mocked(filterTieredCommits).mockReturnValue(emptyTiered);
+    vi.mocked(calculateTieredStats).mockReturnValue(emptyStats);
     vi.mocked(generatePlainOutputWithBranches).mockReturnValue("output");
 
     const { createTimeRangeCommand } = await import("../create-time-range-command");
@@ -257,7 +193,7 @@ describe("createTimeRangeCommand", () => {
 
     await program.parseAsync(["node", "test", "test", "--category", "feature"]);
 
-    expect(filterCommits).toHaveBeenCalledWith(
+    expect(filterTieredCommits).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ category: "feature" }),
     );
@@ -267,41 +203,19 @@ describe("createTimeRangeCommand", () => {
     const { readConfig } = await import("@/utils/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
-      filterCommits,
-      calculateStatsFromFiltered,
+      filterTieredCommits,
+      calculateTieredStats,
     } = await import("@/utils/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
-    vi.mocked(readConfig).mockResolvedValue({
-      authorEmails: ["test@example.com"],
-      repos: [{ name: "repo1", path: "/path" }],
-      sprintLength: 3,
-      groupBy: "repo",
-      locale: "en-US",
-      mainBranch: "main",
-      branchStrategy: "all",
-    });
-
+    vi.mocked(readConfig).mockResolvedValue({ ...mockConfig, sprintLength: 3 });
     vi.mocked(fetchAndCategorizeCommitsWithBranches).mockResolvedValue({
-      merged: { feature: [] },
-      unmerged: {},
-      stats: {
-        totalCommits: 0,
-        mergedCommits: 0,
-        unmergedCommits: 0,
-        repos: new Set(),
-      },
+      tiered: emptyTiered,
+      stats: emptyStats,
     });
-
-    vi.mocked(filterCommits).mockReturnValue({});
-    vi.mocked(calculateStatsFromFiltered).mockReturnValue({
-      totalCommits: 0,
-      mergedCommits: 0,
-      unmergedCommits: 0,
-      repos: new Set(),
-    });
-
+    vi.mocked(filterTieredCommits).mockReturnValue(emptyTiered);
+    vi.mocked(calculateTieredStats).mockReturnValue(emptyStats);
     vi.mocked(generatePlainOutputWithBranches).mockReturnValue("output");
 
     const { createTimeRangeCommand } = await import("../create-time-range-command");

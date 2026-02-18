@@ -70,3 +70,27 @@ export const scoreCommit = (commit: CommitWithBranch): ImportanceLevel => {
 
   return "low";
 };
+
+/**
+ * Partitions commits into key (high/medium importance) and other (low importance) groups.
+ *
+ * @param commits - Enriched commits with branch and merge info.
+ * @returns Object with `key` (high + medium) and `other` (low) commit arrays.
+ */
+export const partitionByImportance = (
+  commits: Array<CommitWithBranch>,
+): { key: Array<CommitWithBranch>; other: Array<CommitWithBranch> } => {
+  const key: Array<CommitWithBranch> = [];
+  const other: Array<CommitWithBranch> = [];
+
+  for (const commit of commits) {
+    const level = scoreCommit(commit);
+    if (level === "low") {
+      other.push(commit);
+    } else {
+      key.push(commit);
+    }
+  }
+
+  return { key, other };
+};

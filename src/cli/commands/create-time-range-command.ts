@@ -1,9 +1,9 @@
 import type { Command } from "commander";
 import type { ColorMode, OutputFormat, OutputOptions } from "@/types";
 import {
-  calculateStatsFromFiltered,
+  calculateTieredStats,
   fetchAndCategorizeCommitsWithBranches,
-  filterCommits,
+  filterTieredCommits,
 } from "@/utils/commits";
 import { handleCommandError } from "@/utils/process-exit";
 import { readConfig } from "@/utils/read-config";
@@ -49,30 +49,23 @@ export const createTimeRangeCommand = (
             locale: config.locale,
           };
 
-          const { merged, unmerged, stats } =
-            await fetchAndCategorizeCommitsWithBranches(config, dateRange);
-
-          const filteredMerged = filterCommits(merged, {
-            repo: options.repo,
-            category: options.category,
-          });
-          const filteredUnmerged = filterCommits(unmerged, {
-            repo: options.repo,
-            category: options.category,
-          });
-
-          const filteredStats = calculateStatsFromFiltered(
-            filteredMerged,
-            filteredUnmerged,
-            stats.repos,
+          const { tiered, stats } = await fetchAndCategorizeCommitsWithBranches(
+            config,
+            dateRange,
           );
+
+          const filteredTiered = filterTieredCommits(tiered, {
+            repo: options.repo,
+            category: options.category,
+          });
+
+          const filteredStats = calculateTieredStats(filteredTiered, stats.repos);
 
           if (outputOptions.format === "markdown") {
             const { generateMarkdownOutputWithBranches } =
               await import("@/utils/output/markdown");
             const output = generateMarkdownOutputWithBranches(
-              filteredMerged,
-              filteredUnmerged,
+              filteredTiered,
               filteredStats,
               outputOptions,
               dateRange,
@@ -82,8 +75,7 @@ export const createTimeRangeCommand = (
             const { generatePlainOutputWithBranches } =
               await import("@/utils/output/plain");
             const output = generatePlainOutputWithBranches(
-              filteredMerged,
-              filteredUnmerged,
+              filteredTiered,
               filteredStats,
               outputOptions,
             );

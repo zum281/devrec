@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   detectImportanceByKeyword,
   detectImportanceByMergeStatus,
+  partitionByImportance,
   scoreCommit,
 } from "../importance";
 import { createCommitWithBranch } from "./fixtures";
@@ -184,6 +185,56 @@ describe("detectImportanceByMergeStatus", () => {
 
   it("should return low for unmerged commits", () => {
     expect(detectImportanceByMergeStatus(false)).toBe("low");
+  });
+});
+
+describe("partitionByImportance", () => {
+  it("should place high-importance commits in key", () => {
+    const commits = [
+      createCommitWithBranch({ message: "security: patch auth", isMerged: true }),
+    ];
+    const { key, other } = partitionByImportance(commits);
+    expect(key).toHaveLength(1);
+    expect(other).toHaveLength(0);
+  });
+
+  it("should place medium-importance commits in key", () => {
+    const commits = [
+      createCommitWithBranch({
+        message: "performance: optimize query",
+        isMerged: false,
+      }),
+    ];
+    const { key, other } = partitionByImportance(commits);
+    expect(key).toHaveLength(1);
+    expect(other).toHaveLength(0);
+  });
+
+  it("should place low-importance commits in other", () => {
+    const commits = [
+      createCommitWithBranch({ message: "feat: add button", isMerged: false }),
+    ];
+    const { key, other } = partitionByImportance(commits);
+    expect(key).toHaveLength(0);
+    expect(other).toHaveLength(1);
+  });
+
+  it("should split mixed-importance commits correctly", () => {
+    const commits = [
+      createCommitWithBranch({ message: "security: patch", isMerged: true }),
+      createCommitWithBranch({ message: "feat: add button", isMerged: false }),
+      createCommitWithBranch({ message: "performance: optimize", isMerged: false }),
+      createCommitWithBranch({ message: "chore: update deps", isMerged: false }),
+    ];
+    const { key, other } = partitionByImportance(commits);
+    expect(key).toHaveLength(2);
+    expect(other).toHaveLength(2);
+  });
+
+  it("should return empty arrays for empty input", () => {
+    const { key, other } = partitionByImportance([]);
+    expect(key).toHaveLength(0);
+    expect(other).toHaveLength(0);
   });
 });
 

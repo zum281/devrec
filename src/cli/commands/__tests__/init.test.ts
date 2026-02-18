@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/promise-function-async -- vitest mock callbacks return Promise.resolve() without async */
+
 /* eslint-disable unicorn/no-useless-undefined -- vitest mockResolvedValue requires explicit undefined for void returns */
 import { Command } from "commander";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -30,9 +31,8 @@ describe("registerInitCommand", () => {
   const setupScanFlow = async (repoPaths: Array<string>) => {
     const { input, confirm, select } = await import("@inquirer/prompts");
     const { access, mkdir, writeFile } = await import("node:fs/promises");
-    const { collectAuthorEmails, collectRepos } = await import(
-      "@/utils/init-prompts"
-    );
+    const { collectAuthorEmails, collectRepos } =
+      await import("@/utils/init-prompts");
 
     vi.mocked(access).mockRejectedValue(new Error("not found"));
     vi.mocked(mkdir).mockResolvedValue(undefined);
@@ -43,12 +43,22 @@ describe("registerInitCommand", () => {
       repoPaths.map(p => ({ name: p.split("/").pop() ?? "", path: p })),
     );
 
-    return { input, confirm, select, access, mkdir, writeFile, collectAuthorEmails, collectRepos };
+    return {
+      input,
+      confirm,
+      select,
+      access,
+      mkdir,
+      writeFile,
+      collectAuthorEmails,
+      collectRepos,
+    };
   };
 
   test("happy path - scan finds repos, user selects one", async () => {
-    const { writeFile, collectAuthorEmails, collectRepos } =
-      await setupScanFlow(["/Users/me/projects/my-repo"]);
+    const { writeFile, collectAuthorEmails, collectRepos } = await setupScanFlow([
+      "/Users/me/projects/my-repo",
+    ]);
 
     const { input } = await import("@inquirer/prompts");
     vi.mocked(input).mockImplementation(
@@ -78,8 +88,10 @@ describe("registerInitCommand", () => {
   });
 
   test("multiple emails, multiple scanned repos", async () => {
-    const { writeFile, collectAuthorEmails } =
-      await setupScanFlow(["/Users/me/repo1", "/Users/me/repo2"]);
+    const { writeFile, collectAuthorEmails } = await setupScanFlow([
+      "/Users/me/repo1",
+      "/Users/me/repo2",
+    ]);
 
     vi.mocked(collectAuthorEmails).mockResolvedValue([
       "a@example.com",
@@ -109,9 +121,7 @@ describe("registerInitCommand", () => {
   });
 
   test("config exists - overwrite confirmed", async () => {
-    const { confirm, writeFile, access } = await setupScanFlow([
-      "/Users/me/repo",
-    ]);
+    const { confirm, writeFile, access } = await setupScanFlow(["/Users/me/repo"]);
 
     vi.mocked(access).mockResolvedValue(undefined);
 
@@ -185,9 +195,8 @@ describe("registerInitCommand", () => {
   test("no repos found - falls back to manual entry", async () => {
     const { input, select } = await import("@inquirer/prompts");
     const { access, mkdir, writeFile } = await import("node:fs/promises");
-    const { collectAuthorEmails, collectRepos } = await import(
-      "@/utils/init-prompts"
-    );
+    const { collectAuthorEmails, collectRepos } =
+      await import("@/utils/init-prompts");
 
     vi.mocked(access).mockRejectedValue(new Error("not found"));
     vi.mocked(collectAuthorEmails).mockResolvedValue(["test@example.com"]);
@@ -215,9 +224,7 @@ describe("registerInitCommand", () => {
     const configData = JSON.parse(writeCall[1] as string) as {
       repos: Array<{ name: string; path: string }>;
     };
-    expect(configData.repos).toEqual([
-      { name: "my-repo", path: "/path/to/repo" },
-    ]);
+    expect(configData.repos).toEqual([{ name: "my-repo", path: "/path/to/repo" }]);
   });
 
   test("handles file system error", async () => {

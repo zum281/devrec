@@ -37,6 +37,7 @@ export const formatCommitLine = (
 /**
  * Formats commit for markdown output
  * Format: - [hash] message `[branch]` _(date)_
+ * Merged commits (no branch) get a checkmark prefix when showBranches is true
  */
 function formatMarkdownCommit(
   commit: CommitEntry,
@@ -45,12 +46,14 @@ function formatMarkdownCommit(
   showBranches: boolean,
 ): string {
   const branchInfo = showBranches && commit.branch ? ` \`[${commit.branch}]\`` : "";
-  return `    - [${shortHash}] ${commit.message}${branchInfo} _(${formattedDate})_\n`;
+  const mergedPrefix = showBranches && !commit.branch ? "\u2713 " : "";
+  return `    - ${mergedPrefix}[${shortHash}] ${commit.message}${branchInfo} _(${formattedDate})_\n`;
 }
 
 /**
  * Formats commit for plain text output with optional colors
  * Format: - [hash] message [branch] (date)
+ * Merged commits (no branch) get a checkmark prefix when showBranches is true
  */
 function formatPlainCommit(
   commit: CommitEntry,
@@ -68,9 +71,16 @@ function formatPlainCommit(
         : ` [${commit.branch}]`
       : "";
 
+  const mergedPrefix =
+    showBranches && !commit.branch
+      ? isColorsEnabled
+        ? chalk.green("\u2713 ")
+        : "\u2713 "
+      : "";
+
   const datePart = isColorsEnabled
     ? chalk.gray(`(${formattedDate})`)
     : `(${formattedDate})`;
 
-  return `    - ${hashPart} ${commit.message}${branchInfo} ${datePart}\n`;
+  return `    - ${mergedPrefix}${hashPart} ${commit.message}${branchInfo} ${datePart}\n`;
 }
