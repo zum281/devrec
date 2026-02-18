@@ -5,6 +5,9 @@ import type { ImportanceLevel } from "@/types";
  * Matches are case-insensitive and position-independent (anywhere in the message).
  * Returns the highest matching tier (high, then medium, then low as default fallback).
  * Operates on raw strings -- caller should pre-clean Jira prefixes if needed.
+ *
+ * @param commitMsg - The commit message to scan for importance keywords.
+ * @returns The highest matching {@link ImportanceLevel}.
  */
 export const detectImportanceByKeyword = (commitMsg: string): ImportanceLevel => {
   for (const [importance, patterns] of Object.entries(importancePatterns)) {
