@@ -44,6 +44,13 @@ CLI entry (src/cli/main.ts)
 
 ### Key design points
 
+- **Importance scoring**: `src/utils/importance.ts` scores commits via keyword
+  detection (`scoreCommit`) and merge status (`detectImportanceByMergeStatus`).
+  `partitionByImportance` splits commits into `key` (high/medium) and `other` (low).
+- **Commit relationships**: `src/utils/commit-relationships.ts` groups commits by
+  shared Jira ticket key and/or branch name via `findRelatedCommits`.
+- **Batch categorization**: `src/utils/categorize-commits-batch.ts` provides
+  `categorizeCommitsBatch` and `mergeCategorizedCommits` as standalone helpers.
 - **Config**: `~/.config/devrec/config.json`, validated with Zod
   (`src/schemas/config.schema.ts`). Required fields: `authorEmails`, `repos`. All
   others have defaults.
@@ -58,6 +65,11 @@ CLI entry (src/cli/main.ts)
 - **Types**: All shared types live in `src/types.ts`. `CommitWithBranch` is the
   primary enriched commit type; `OutputOptions` carries CLI flags through to
   formatters.
+
+### Available time-range commands
+
+`today`, `yesterday`, `week`, `sprint`, `all` — each in
+`src/cli/commands/<name>.ts`, delegating to `createTimeRangeCommand`.
 
 ### Adding a new time-range command
 

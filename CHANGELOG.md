@@ -1,16 +1,16 @@
 # [1.3.0](https://github.com/zum281/devrec/compare/v1.2.0...v1.3.0) (2026-02-18)
 
-
 ### Features
 
-* importance scoring engine ([02bbf3e](https://github.com/zum281/devrec/commit/02bbf3eb15720070c7ff18bc2688b809e3a68757))
+- importance scoring engine
+  ([02bbf3e](https://github.com/zum281/devrec/commit/02bbf3eb15720070c7ff18bc2688b809e3a68757))
 
 # [1.2.0](https://github.com/zum281/devrec/compare/v1.1.0...v1.2.0) (2026-02-17)
 
-
 ### Features
 
-* get email from global git config ([5f85522](https://github.com/zum281/devrec/commit/5f855228f256a8893f3828be1760a73de383b1e3))
+- get email from global git config
+  ([5f85522](https://github.com/zum281/devrec/commit/5f855228f256a8893f3828be1760a73de383b1e3))
 
 # [1.1.0](https://github.com/zum281/devrec/compare/v1.0.0...v1.1.0) (2026-02-17)
 

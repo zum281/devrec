@@ -92,14 +92,14 @@ Show all commits from all time.
 
 All time-range commands support these flags:
 
-| Flag         | Description          | Values                      | Default |
-| ------------ | -------------------- | --------------------------- | ------- |
-| `--format`   | Output format        | `plain`, `markdown`         | `plain` |
-| `--color`    | Color mode           | `always`, `never`, `auto`   | `auto`  |
-| `--summary`  | Show statistics      | (boolean)                   | `false` |
-| `--repo`     | Filter by repository | Repository name from config | All     |
-| `--category`  | Filter by category   | Category name               | All     |
-| `--highlight` | Boost matching commits to Key Contributions | Branch name or keyword | None |
+| Flag          | Description                                 | Values                      | Default |
+| ------------- | ------------------------------------------- | --------------------------- | ------- |
+| `--format`    | Output format                               | `plain`, `markdown`         | `plain` |
+| `--color`     | Color mode                                  | `always`, `never`, `auto`   | `auto`  |
+| `--summary`   | Show statistics                             | (boolean)                   | `false` |
+| `--repo`      | Filter by repository                        | Repository name from config | All     |
+| `--category`  | Filter by category                          | Category name               | All     |
+| `--highlight` | Boost matching commits to Key Contributions | Branch name or keyword      | None    |
 
 ### Categories
 
@@ -287,8 +287,8 @@ Shows only Feature commits from the "api" repository.
 drec week --highlight feat/auth
 ```
 
-Boosts any commit whose message or branch contains "feat/auth" to Key
-Contributions, regardless of automatic scoring.
+Boosts any commit whose message or branch contains "feat/auth" to Key Contributions,
+regardless of automatic scoring.
 
 ### View all commits
 
