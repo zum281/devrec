@@ -11,7 +11,7 @@ import type {
   Repo,
 } from "@/types";
 
-export const FIXED_DATE = new Date("2024-03-15T10:00:00Z");
+export const FIXED_DATE = new Date("2026-02-20T10:00:00Z");
 
 export const MOCK_DATES = {
   today: "2024-03-15T10:00:00Z",

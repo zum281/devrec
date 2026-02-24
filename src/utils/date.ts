@@ -66,12 +66,9 @@ export const getSprintDateRange = (
   const today = new Date();
   const sprintStartMonday = new Date();
 
-  // Find most recent Monday (or today if Monday)
   const daysSinceMonday = (today.getDay() + 6) % 7;
   sprintStartMonday.setDate(today.getDate() - daysSinceMonday);
-
-  // Go back sprintLength weeks from that Monday
-  sprintStartMonday.setDate(sprintStartMonday.getDate() - sprintLength * 7);
+  sprintStartMonday.setDate(sprintStartMonday.getDate() - (sprintLength - 1) * 7);
 
   return {
     since: sprintStartMonday.toDateString(),
