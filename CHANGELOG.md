@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/zum281/devrec/compare/v1.3.0...v1.3.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* **dev-37:** fix sprint start calculation ([db3da4c](https://github.com/zum281/devrec/commit/db3da4c2fd5b68db055bf2cf8650fa77be54b072))
+
 # [1.3.0](https://github.com/zum281/devrec/compare/v1.2.0...v1.3.0) (2026-02-18)
 
 ### Features
