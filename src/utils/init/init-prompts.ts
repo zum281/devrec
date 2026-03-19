@@ -2,10 +2,10 @@ import { checkbox, confirm, input, search } from "@inquirer/prompts";
 import { basename } from "node:path";
 import { z } from "zod";
 import type { Repo } from "@/types";
-import { scanGlobalGitEmail } from "@/utils/git-email-scanner";
-import { scanGitRepos, toDisplay } from "@/utils/git-repo-scanner";
-import { pathSearchSource } from "@/utils/path-search";
-import { validateRepoPath } from "@/utils/validate-repo";
+import { scanGlobalGitEmail } from "@/utils/git/git-email-scanner";
+import { scanGitRepos, toDisplay } from "@/utils/git/git-repo-scanner";
+import { pathSearchSource } from "@/utils/init/path-search";
+import { validateRepoPath } from "@/utils/repo/validate-repo";
 
 /**
  * Collects emails manually one at a time with Zod validation.

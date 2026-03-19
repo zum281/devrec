@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-vi.mock("@/utils/read-package");
+vi.mock("@/utils/config/read-package");
 vi.mock("../commands/init");
 vi.mock("../commands/today");
 vi.mock("../commands/yesterday");
@@ -15,7 +15,7 @@ describe("main", () => {
   });
 
   test("registers all commands with correct configuration", async () => {
-    const { readPackageInfo } = await import("@/utils/read-package");
+    const { readPackageInfo } = await import("@/utils/config/read-package");
     const { registerInitCommand } = await import("../commands/init");
     const { registerTodayCommand } = await import("../commands/today");
     const { registerYesterdayCommand } = await import("../commands/yesterday");
@@ -53,7 +53,7 @@ describe("main", () => {
   });
 
   test("sets program metadata from package.json", async () => {
-    const { readPackageInfo } = await import("@/utils/read-package");
+    const { readPackageInfo } = await import("@/utils/config/read-package");
 
     vi.mocked(readPackageInfo).mockResolvedValue({
       name: "test-name",
@@ -96,7 +96,7 @@ describe("main", () => {
   });
 
   test("handles readPackageInfo error", async () => {
-    const { readPackageInfo } = await import("@/utils/read-package");
+    const { readPackageInfo } = await import("@/utils/config/read-package");
 
     const testError = new Error("Package.json not found");
     vi.mocked(readPackageInfo).mockRejectedValue(testError);

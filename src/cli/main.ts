@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { readPackageInfo } from "@/utils/read-package";
+import { readPackageInfo } from "@/utils/config/read-package";
 import { registerAllCommand } from "./commands/all";
 import { registerInitCommand } from "./commands/init";
 import { registerSprintCommand } from "./commands/sprint";

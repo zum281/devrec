@@ -4,8 +4,8 @@ import {
   fetchAndCategorizeCommits,
   filterCommits,
   outputCommits,
-} from "@/utils/commits";
-import { readConfig } from "@/utils/read-config";
+} from "@/utils/commits/commits";
+import { readConfig } from "@/utils/config/read-config";
 import { addCommonOptions, type CommandOptions } from "./shared";
 
 /**

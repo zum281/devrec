@@ -6,7 +6,7 @@ import type {
   TieredCommits,
   TieredStats,
 } from "@/types";
-import { mergeCategorizedCommits } from "@/utils/categorize-commits-batch";
+import { mergeCategorizedCommits } from "@/utils/categorization/categorize-commits-batch";
 import { calculateStats } from "./calculate-stats";
 import { formatCommitLine } from "./format-commit";
 import {

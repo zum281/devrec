@@ -2,10 +2,10 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@inquirer/prompts");
-vi.mock("@/utils/validate-repo");
-vi.mock("@/utils/path-search");
-vi.mock("@/utils/git-repo-scanner");
-vi.mock("@/utils/git-email-scanner");
+vi.mock("@/utils/repo/validate-repo");
+vi.mock("@/utils/init/path-search");
+vi.mock("@/utils/git/git-repo-scanner");
+vi.mock("@/utils/git/git-email-scanner");
 
 describe("collectEmailsManually", () => {
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe("collectAuthorEmails", () => {
 
   test("pre-fills global email when user confirms", async () => {
     const { confirm } = await import("@inquirer/prompts");
-    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+    const { scanGlobalGitEmail } = await import("@/utils/git/git-email-scanner");
 
     vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
 
@@ -86,7 +86,7 @@ describe("collectAuthorEmails", () => {
 
   test("skips global email when user declines", async () => {
     const { confirm, input } = await import("@inquirer/prompts");
-    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+    const { scanGlobalGitEmail } = await import("@/utils/git/git-email-scanner");
 
     vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
     vi.mocked(confirm).mockResolvedValue(false); // decline global, then decline "add another"
@@ -100,7 +100,7 @@ describe("collectAuthorEmails", () => {
 
   test("falls back to manual when no global email found", async () => {
     const { confirm, input } = await import("@inquirer/prompts");
-    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+    const { scanGlobalGitEmail } = await import("@/utils/git/git-email-scanner");
 
     vi.mocked(scanGlobalGitEmail).mockResolvedValue(null);
     vi.mocked(input).mockResolvedValue("typed@example.com");
@@ -114,7 +114,7 @@ describe("collectAuthorEmails", () => {
 
   test("combines global email with manual additions", async () => {
     const { confirm, input } = await import("@inquirer/prompts");
-    const { scanGlobalGitEmail } = await import("@/utils/git-email-scanner");
+    const { scanGlobalGitEmail } = await import("@/utils/git/git-email-scanner");
 
     vi.mocked(scanGlobalGitEmail).mockResolvedValue("global@example.com");
     vi.mocked(input).mockResolvedValue("extra@example.com");
@@ -141,7 +141,7 @@ describe("collectReposManually", () => {
 
   test("collects a single repo", async () => {
     const { input, confirm, search } = await import("@inquirer/prompts");
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
 
     vi.mocked(input).mockResolvedValue("my-repo");
     vi.mocked(search).mockResolvedValue("/path/to/repo");
@@ -156,7 +156,7 @@ describe("collectReposManually", () => {
 
   test("collects multiple repos", async () => {
     const { input, confirm, search } = await import("@inquirer/prompts");
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
 
     let inputCallCount = 0;
     vi.mocked(input).mockImplementation(() => {
@@ -198,7 +198,7 @@ describe("collectRepos", () => {
 
   test("presents scanned repos as checkbox choices", async () => {
     const { checkbox, confirm } = await import("@inquirer/prompts");
-    const { scanGitRepos } = await import("@/utils/git-repo-scanner");
+    const { scanGitRepos } = await import("@/utils/git/git-repo-scanner");
 
     vi.mocked(scanGitRepos).mockResolvedValue([
       "/Users/me/projects/repo-a",
@@ -216,8 +216,8 @@ describe("collectRepos", () => {
 
   test("falls back to manual entry when no repos found", async () => {
     const { input, confirm, search } = await import("@inquirer/prompts");
-    const { scanGitRepos } = await import("@/utils/git-repo-scanner");
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { scanGitRepos } = await import("@/utils/git/git-repo-scanner");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
 
     vi.mocked(scanGitRepos).mockResolvedValue([]);
     vi.mocked(input).mockResolvedValue("manual-repo");
@@ -234,8 +234,8 @@ describe("collectRepos", () => {
 
   test("allows adding manual repos after scan selection", async () => {
     const { checkbox, confirm, input, search } = await import("@inquirer/prompts");
-    const { scanGitRepos } = await import("@/utils/git-repo-scanner");
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { scanGitRepos } = await import("@/utils/git/git-repo-scanner");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
 
     vi.mocked(scanGitRepos).mockResolvedValue(["/Users/me/scanned-repo"]);
     vi.mocked(checkbox).mockResolvedValue(["/Users/me/scanned-repo"]);

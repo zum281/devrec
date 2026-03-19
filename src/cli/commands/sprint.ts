@@ -1,4 +1,4 @@
-import { getSprintDateRange } from "@/utils/date";
+import { getSprintDateRange } from "@/utils/shared/date";
 import { createTimeRangeCommand } from "./create-time-range-command";
 
 /**

@@ -5,8 +5,8 @@ import os from "node:os";
 import { dirname } from "node:path";
 import { ConfigSchema } from "@/schemas/config.schema";
 import type { BranchStrategy, Config } from "@/types";
-import { collectAuthorEmails, collectRepos } from "@/utils/init-prompts";
-import { handleCommandError } from "@/utils/process-exit";
+import { collectAuthorEmails, collectRepos } from "@/utils/init/init-prompts";
+import { handleCommandError } from "@/utils/shared/process-exit";
 
 export const registerInitCommand = (program: Command): void => {
   program

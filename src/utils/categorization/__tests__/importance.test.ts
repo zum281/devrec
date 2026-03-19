@@ -5,7 +5,7 @@ import {
   partitionByImportance,
   scoreCommit,
 } from "../importance";
-import { createCommitWithBranch } from "./fixtures";
+import { createCommitWithBranch } from "@/utils/shared/__tests__/fixtures";
 
 describe("detectImportanceByKeyword", () => {
   describe("high importance", () => {

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { pathSearchSource } from "../path-search";
 
 vi.mock("node:fs/promises");
-vi.mock("@/utils/git-repo-scanner", () => ({
+vi.mock("@/utils/git/git-repo-scanner", () => ({
   scanGitRepos: vi.fn().mockResolvedValue([]),
   toDisplay: (p: string) =>
     p.startsWith(os.homedir()) ? p.replace(os.homedir(), "~") : p,
@@ -122,7 +122,7 @@ describe("pathSearchSource – fuzzy mode", () => {
   });
 
   test("searches git repos by folder name", async () => {
-    const { scanGitRepos } = await import("@/utils/git-repo-scanner");
+    const { scanGitRepos } = await import("@/utils/git/git-repo-scanner");
     vi.mocked(scanGitRepos).mockResolvedValue([
       "/Users/me/projects/my-app",
       "/Users/me/work/my-api",
@@ -136,7 +136,7 @@ describe("pathSearchSource – fuzzy mode", () => {
   });
 
   test("returns empty when no repos match", async () => {
-    const { scanGitRepos } = await import("@/utils/git-repo-scanner");
+    const { scanGitRepos } = await import("@/utils/git/git-repo-scanner");
     vi.mocked(scanGitRepos).mockResolvedValue(["/Users/me/projects/foo"]);
 
     const results = await pathSearchSource("zzz");

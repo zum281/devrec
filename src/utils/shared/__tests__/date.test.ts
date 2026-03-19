@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { FIXED_DATE } from "@/utils/__tests__/fixtures";
+import { FIXED_DATE } from "@/utils/shared/__tests__/fixtures";
 import {
   getDateRange,
   getLastTwoWeeksDateRange,

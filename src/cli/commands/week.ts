@@ -1,4 +1,4 @@
-import { getWeekDateRange } from "@/utils/date";
+import { getWeekDateRange } from "@/utils/shared/date";
 import { createTimeRangeCommand } from "./create-time-range-command";
 
 /**

@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { exitWithError } from "./process-exit";
+import { exitWithError } from "@/utils/shared/process-exit";
 import { formatValidationErrors } from "./read-json-file";
 
 /**

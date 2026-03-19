@@ -1,4 +1,4 @@
-import { getDateRange } from "@/utils/date";
+import { getDateRange } from "@/utils/shared/date";
 import { createTimeRangeCommand } from "./create-time-range-command";
 
 /**

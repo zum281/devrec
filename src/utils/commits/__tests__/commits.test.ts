@@ -11,10 +11,10 @@ import {
   outputCommits,
   printCategorizedCommits,
 } from "../commits";
-import { createCommitEntry } from "./fixtures";
+import { createCommitEntry } from "@/utils/shared/__tests__/fixtures";
 
-vi.mock("@/utils/validate-repo");
-vi.mock("@/utils/git-log");
+vi.mock("@/utils/repo/validate-repo");
+vi.mock("@/utils/git/git-log");
 
 describe("groupByRepo", () => {
   test("groups empty commits", () => {
@@ -295,7 +295,7 @@ describe("fetchAndCategorizeCommits", () => {
   });
 
   test("skips repo when path does not exist", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
     vi.mocked(validateRepoPath).mockResolvedValue({
       valid: false,
       reason: "not-found",
@@ -320,7 +320,7 @@ describe("fetchAndCategorizeCommits", () => {
   });
 
   test("skips repo when path is not a git repository", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
     vi.mocked(validateRepoPath).mockResolvedValue({
       valid: false,
       reason: "not-git",
@@ -345,7 +345,7 @@ describe("fetchAndCategorizeCommits", () => {
   });
 
   test("skips repo when no permission to read", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
     vi.mocked(validateRepoPath).mockResolvedValue({
       valid: false,
       reason: "no-permission",
@@ -370,8 +370,8 @@ describe("fetchAndCategorizeCommits", () => {
   });
 
   test("continues with valid repos after skipping invalid ones", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
-    const { getGitLog } = await import("@/utils/git-log");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
+    const { getGitLog } = await import("@/utils/git/git-log");
 
     vi.mocked(validateRepoPath)
       .mockResolvedValueOnce({ valid: false, reason: "not-found" })
@@ -554,8 +554,8 @@ describe("Multi-repo scenarios", () => {
   });
 
   test("fetches commits from 2 valid repos", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
-    const { getGitLog } = await import("@/utils/git-log");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
+    const { getGitLog } = await import("@/utils/git/git-log");
 
     vi.mocked(validateRepoPath).mockResolvedValue({ valid: true });
 
@@ -612,8 +612,8 @@ describe("Multi-repo scenarios", () => {
   });
 
   test("fetches commits from 2 repos with same category", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
-    const { getGitLog } = await import("@/utils/git-log");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
+    const { getGitLog } = await import("@/utils/git/git-log");
 
     vi.mocked(validateRepoPath).mockResolvedValue({ valid: true });
 
@@ -768,8 +768,8 @@ describe("Multi-repo scenarios", () => {
   });
 
   test("handles one repo empty, one with commits", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
-    const { getGitLog } = await import("@/utils/git-log");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
+    const { getGitLog } = await import("@/utils/git/git-log");
 
     vi.mocked(validateRepoPath).mockResolvedValue({ valid: true });
 
@@ -806,8 +806,8 @@ describe("Multi-repo scenarios", () => {
   });
 
   test("handles duplicate repo names", async () => {
-    const { validateRepoPath } = await import("@/utils/validate-repo");
-    const { getGitLog } = await import("@/utils/git-log");
+    const { validateRepoPath } = await import("@/utils/repo/validate-repo");
+    const { getGitLog } = await import("@/utils/git/git-log");
 
     vi.mocked(validateRepoPath).mockResolvedValue({ valid: true });
 

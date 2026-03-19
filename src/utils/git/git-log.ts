@@ -1,6 +1,6 @@
 import git from "simple-git";
 import type { Commit, CommitWithBranch, Config } from "@/types";
-import { expandTilde } from "@/utils/path";
+import { expandTilde } from "@/utils/shared/path";
 
 /**
  * Parses branch list from git command output

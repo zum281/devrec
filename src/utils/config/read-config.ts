@@ -3,7 +3,7 @@ import { ConfigSchema } from "@/schemas/config.schema";
 import type { Config } from "@/types";
 import { isFileNotFound, isPermissionDenied } from "./file-errors";
 import { handleJsonFileError } from "./handle-json-file-error";
-import { exitWithError } from "./process-exit";
+import { exitWithError } from "@/utils/shared/process-exit";
 import { readJsonFile } from "./read-json-file";
 
 /**

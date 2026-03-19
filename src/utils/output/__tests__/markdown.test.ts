@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { TieredCommits, TieredStats } from "@/types";
-import { createCommitEntry, createOutputOptions } from "@/utils/__tests__/fixtures";
+import { createCommitEntry, createOutputOptions } from "@/utils/shared/__tests__/fixtures";
 import {
   generateMarkdownOutput,
   generateMarkdownOutputWithBranches,

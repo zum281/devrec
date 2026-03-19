@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { setupConsoleSpy, setupProcessExitSpy } from "@/utils/__tests__/fixtures";
+import { setupConsoleSpy, setupProcessExitSpy } from "@/utils/shared/__tests__/fixtures";
 
 vi.mock("node:fs/promises");
 

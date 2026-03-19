@@ -6,11 +6,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@inquirer/prompts");
 vi.mock("node:fs/promises");
-vi.mock("@/utils/validate-repo");
-vi.mock("@/utils/process-exit");
-vi.mock("@/utils/path-search");
-vi.mock("@/utils/git-repo-scanner");
-vi.mock("@/utils/init-prompts");
+vi.mock("@/utils/repo/validate-repo");
+vi.mock("@/utils/shared/process-exit");
+vi.mock("@/utils/init/path-search");
+vi.mock("@/utils/git/git-repo-scanner");
+vi.mock("@/utils/init/init-prompts");
 
 describe("registerInitCommand", () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -32,7 +32,7 @@ describe("registerInitCommand", () => {
     const { input, confirm, select } = await import("@inquirer/prompts");
     const { access, mkdir, writeFile } = await import("node:fs/promises");
     const { collectAuthorEmails, collectRepos } =
-      await import("@/utils/init-prompts");
+      await import("@/utils/init/init-prompts");
 
     vi.mocked(access).mockRejectedValue(new Error("not found"));
     vi.mocked(mkdir).mockResolvedValue(undefined);
@@ -169,7 +169,7 @@ describe("registerInitCommand", () => {
 
   test("user cancels with ExitPromptError", async () => {
     const { access } = await import("node:fs/promises");
-    const { collectAuthorEmails } = await import("@/utils/init-prompts");
+    const { collectAuthorEmails } = await import("@/utils/init/init-prompts");
 
     vi.mocked(access).mockRejectedValue(new Error("not found"));
 
@@ -196,7 +196,7 @@ describe("registerInitCommand", () => {
     const { input, select } = await import("@inquirer/prompts");
     const { access, mkdir, writeFile } = await import("node:fs/promises");
     const { collectAuthorEmails, collectRepos } =
-      await import("@/utils/init-prompts");
+      await import("@/utils/init/init-prompts");
 
     vi.mocked(access).mockRejectedValue(new Error("not found"));
     vi.mocked(collectAuthorEmails).mockResolvedValue(["test@example.com"]);
@@ -230,7 +230,7 @@ describe("registerInitCommand", () => {
   test("handles file system error", async () => {
     const { confirm } = await setupScanFlow(["/Users/me/repo"]);
     const { mkdir } = await import("node:fs/promises");
-    const { handleCommandError } = await import("@/utils/process-exit");
+    const { handleCommandError } = await import("@/utils/shared/process-exit");
 
     const { input } = await import("@inquirer/prompts");
     vi.mocked(input).mockImplementation(

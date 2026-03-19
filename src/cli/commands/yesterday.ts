@@ -1,4 +1,4 @@
-import { getYesterdayDateRange } from "@/utils/date";
+import { getYesterdayDateRange } from "@/utils/shared/date";
 import { createTimeRangeCommand } from "./create-time-range-command";
 
 /**

@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import os from "node:os";
 import { basename, dirname, join } from "node:path";
-import { scanGitRepos, toDisplay } from "@/utils/git-repo-scanner";
+import { scanGitRepos, toDisplay } from "@/utils/git/git-repo-scanner";
 
 type PathChoice = { value: string; name: string; short: string };
 

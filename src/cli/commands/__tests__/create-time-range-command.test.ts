@@ -2,11 +2,11 @@ import { Command } from "commander";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { TieredCommits, TieredStats } from "@/types";
 
-vi.mock("@/utils/read-config");
-vi.mock("@/utils/commits");
+vi.mock("@/utils/config/read-config");
+vi.mock("@/utils/commits/commits");
 vi.mock("@/utils/output/plain");
 vi.mock("@/utils/output/markdown");
-vi.mock("@/utils/process-exit");
+vi.mock("@/utils/shared/process-exit");
 
 const emptyTiered: TieredCommits = {
   keyContributions: { merged: {}, unmerged: {} },
@@ -56,12 +56,12 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("executes plain format output by default", async () => {
-    const { readConfig } = await import("@/utils/read-config");
+    const { readConfig } = await import("@/utils/config/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
       filterTieredCommits,
       calculateTieredStats,
-    } = await import("@/utils/commits");
+    } = await import("@/utils/commits/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
@@ -91,12 +91,12 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("executes markdown format when specified", async () => {
-    const { readConfig } = await import("@/utils/read-config");
+    const { readConfig } = await import("@/utils/config/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
       filterTieredCommits,
       calculateTieredStats,
-    } = await import("@/utils/commits");
+    } = await import("@/utils/commits/commits");
     const { generateMarkdownOutputWithBranches } =
       await import("@/utils/output/markdown");
 
@@ -126,12 +126,12 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("applies repo filter when specified", async () => {
-    const { readConfig } = await import("@/utils/read-config");
+    const { readConfig } = await import("@/utils/config/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
       filterTieredCommits,
       calculateTieredStats,
-    } = await import("@/utils/commits");
+    } = await import("@/utils/commits/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
@@ -163,12 +163,12 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("applies category filter when specified", async () => {
-    const { readConfig } = await import("@/utils/read-config");
+    const { readConfig } = await import("@/utils/config/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
       filterTieredCommits,
       calculateTieredStats,
-    } = await import("@/utils/commits");
+    } = await import("@/utils/commits/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
@@ -200,12 +200,12 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("sprint command passes sprint length to date range function", async () => {
-    const { readConfig } = await import("@/utils/read-config");
+    const { readConfig } = await import("@/utils/config/read-config");
     const {
       fetchAndCategorizeCommitsWithBranches,
       filterTieredCommits,
       calculateTieredStats,
-    } = await import("@/utils/commits");
+    } = await import("@/utils/commits/commits");
     const { generatePlainOutputWithBranches } =
       await import("@/utils/output/plain");
 
@@ -234,8 +234,8 @@ describe("createTimeRangeCommand", () => {
   });
 
   test("handles error and calls handleCommandError", async () => {
-    const { readConfig } = await import("@/utils/read-config");
-    const { handleCommandError } = await import("@/utils/process-exit");
+    const { readConfig } = await import("@/utils/config/read-config");
+    const { handleCommandError } = await import("@/utils/shared/process-exit");
 
     const testError = new Error("Test error");
     vi.mocked(readConfig).mockRejectedValue(testError);

@@ -1,7 +1,7 @@
 import { constants } from "node:fs";
 import { access, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { expandTilde } from "@/utils/path";
+import { expandTilde } from "@/utils/shared/path";
 
 export type RepoValidationResult =
   | { valid: true }

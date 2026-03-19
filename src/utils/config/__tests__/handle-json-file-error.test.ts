@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 import type { ZodError } from "zod";
-import { setupConsoleSpy, setupProcessExitSpy } from "@/utils/__tests__/fixtures";
+import { setupConsoleSpy, setupProcessExitSpy } from "@/utils/shared/__tests__/fixtures";
 import { handleJsonFileError } from "../handle-json-file-error";
 
 vi.mock("../read-json-file", () => ({

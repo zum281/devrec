@@ -1,5 +1,5 @@
 import type { CategorizedCommits, CommitEntry } from "@/types";
-import { groupByRepo, groupCommitsByRepo } from "@/utils/commits";
+import { groupByRepo, groupCommitsByRepo } from "@/utils/commits/commits";
 
 export type SectionFormatter = {
   level1Header: (name: string) => string;

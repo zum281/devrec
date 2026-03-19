@@ -12,14 +12,14 @@ import type {
 import {
   categorizeCommitsBatch,
   mergeCategorizedCommits,
-} from "@/utils/categorize-commits-batch";
-import { resolveCategoryFilter } from "@/utils/category-filter";
-import { categorizeCommit } from "@/utils/category-patterns";
-import { getGitLog, getGitLogWithBranches } from "@/utils/git-log";
-import { groupBy } from "@/utils/group-by";
-import { partitionByImportance } from "@/utils/importance";
-import { logRepoValidationWarning } from "@/utils/repo-warnings";
-import { validateRepoPath } from "@/utils/validate-repo";
+} from "@/utils/categorization/categorize-commits-batch";
+import { resolveCategoryFilter } from "@/utils/categorization/category-filter";
+import { categorizeCommit } from "@/utils/categorization/category-patterns";
+import { getGitLog, getGitLogWithBranches } from "@/utils/git/git-log";
+import { groupBy } from "@/utils/shared/group-by";
+import { partitionByImportance } from "@/utils/categorization/importance";
+import { logRepoValidationWarning } from "@/utils/repo/repo-warnings";
+import { validateRepoPath } from "@/utils/repo/validate-repo";
 
 /**
  * Fetches, categorizes, and returns commits from all configured repositories

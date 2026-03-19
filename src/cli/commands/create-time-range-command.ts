@@ -4,9 +4,9 @@ import {
   calculateTieredStats,
   fetchAndCategorizeCommitsWithBranches,
   filterTieredCommits,
-} from "@/utils/commits";
-import { handleCommandError } from "@/utils/process-exit";
-import { readConfig } from "@/utils/read-config";
+} from "@/utils/commits/commits";
+import { handleCommandError } from "@/utils/shared/process-exit";
+import { readConfig } from "@/utils/config/read-config";
 import { addCommonOptions, type CommandOptions } from "./shared";
 
 type DateRangeFunction =
